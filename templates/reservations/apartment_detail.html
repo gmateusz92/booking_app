@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+    <title>{{ home.name }} - Home Details</title>
+    <!-- Dodaj linki do Bootstrap i innych styli -->
+    
+
+<body>
+
+
+    
+    <div class="container mt-5">
+        <h1>{{ apartment.name }}</h1>
+    
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Główne zdjęcie -->
+                <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }}" class="img-fluid mb-3 main-photo">
+    
+                <!-- Informacje o domu -->
+                <h3>Informacje o domu</h3>
+                <p><strong>Opis:</strong> {{ apartment.description }}</p>
+                <p><strong>Liczba łóżek:</strong> {{ apartment.beds }}</p>
+                <p><strong>Pojemność:</strong> {{ apartment.capacity }}</p>
+                <p><strong>Cena:</strong> {{ apartment.price }} $</p>
+            </div>
+    
+            <div class="col-md-4">
+                <!-- 4 mniejsze zdjęcia -->
+                <div class="row">
+                    {% for photo in apartment.photos.all %}
+                        <div class="col-md-3 mb-3">
+                            <img src="{{ photo.image.url }}" alt="{{ apartment.name }}" class="img-fluid smallerr-photo">
+                        </div>
+                    {% endfor %}
+                </div>
+    
+                <!-- Okno do rezerwacji -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Rezerwacja</h5>
+                        <!-- Dodaj formularz rezerwacji lub inny element do rezerwacji -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .smallerr-photo {
+        width: 100%;  /* Pełna szerokość */
+        height: auto; /* Proporcjonalna wysokość */
+        max-height: 400px;  /* Maksymalna wysokość dla mniejszych zdjęć */
+        }
+    </style>
+
+<!-- Dodaj skrypty Bootstrap i inne skrypty JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
+
+{% if user == apartment.user %}
+
+edit
+<a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}">Edit</a>
+
+
+{% endif %}
+
+
+{% endblock %}

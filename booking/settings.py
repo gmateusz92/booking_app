@@ -83,6 +83,8 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'accounts.User' # model potrzebny do tworzenia userow
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -124,6 +126,13 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
+
+
+# STATIC_DIR = os.path.join(BASE_DIR,"static")
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#          STATIC_DIR,
+#      ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

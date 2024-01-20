@@ -53,21 +53,21 @@ class UserManager(BaseUserManager):
 #  authentication functionality, but no actual fields: you have to supply them when you subclass.   
 
 class User(AbstractBaseUser):
-    VENDOR = 1
-    CUSTOMER = 2
+    # VENDOR = 1
+    # CUSTOMER = 2
     
 
-    ROLE_CHOICE = (
-        (VENDOR, 'Vendor'),
-        (CUSTOMER, 'Customer'),
+    # ROLE_CHOICE = (
+    #     (VENDOR, 'Vendor'),
+    #     (CUSTOMER, 'Customer'),
         
-    )
+    # )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=12, blank=True)
-    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True)
+    # role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True)
 
     # required fields
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -76,7 +76,7 @@ class User(AbstractBaseUser):
     modified_date = models.DateTimeField(auto_now=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_superadmin = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
@@ -93,12 +93,12 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
-    def get_role(self): #definije czy uzytkoniwk jest vendor czy customer
-        if self.role == 1:
-            user_role = 'Vendor'
-        elif self.role == 2:
-            user_role = "Customer"    
-        return user_role       
+    # def get_role(self): #definije czy uzytkoniwk jest vendor czy customer
+    #     if self.role == 1:
+    #         user_role = 'Vendor'
+    #     elif self.role == 2:
+    #         user_role = "Customer"    
+    #     return user_role       
 
 
 class UserProfile(models.Model):

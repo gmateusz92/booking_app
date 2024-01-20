@@ -1,24 +1,35 @@
 from django.db import models
+from booking import settings
 
-class Room(models.Model):
-   
+
+class Apartment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=20)
+    description = models.CharField(null=True, max_length=1000)
     beds = models.IntegerField(null=True)
-    capacity = models.CharField(max_length=100, null=True)
-
+    capacity = models.IntegerField(null=True)
+    price = models.IntegerField(null=True)
+    
     def __str__(self):
         return f'{self.name} with {self.beds} beds for {self.capacity} people'
 
+class Photo(models.Model):
+    apartment = models.ForeignKey(Apartment, related_name='photos', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='static/images/', null=True, blank=True)
+    
+    def __str__(self):
+        return f'{self.image} '
 
 
-# class Booking(models.Model):
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
-#     room = models.ForeignKey(Room, on_delete=models.CASCADE, null=True)
-#     check_in = models.DateTimeField(null=True)
-#     check_out = models.DateTimeField(null=True)
 
-#     def __str__(self):
-#         return f'{self.user} has booked {self.room} from {self.check_in} to {self.check_out}'
+class Booking(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    name = models.ForeignKey(Apartment, on_delete=models.CASCADE, null=True)
+    check_in = models.DateTimeField(null=True)
+    check_out = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return f'{self.user} has booked {self.name} from {self.check_in} to {self.check_out}'
 
 #     def get_room_category(self): #funkcja pokazuje cala nazwe katerogii pokoju
 #         room_categories = dict(self.room.ROOM_CATEGORIES)

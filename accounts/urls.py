@@ -1,5 +1,5 @@
 from django.urls import path
-from. views import registerUser, index, registerVendor, login, logout,  custDashboard, vendorDashboard
+from. views import registerUser, index, login, logout,  custDashboard, vendorDashboard
 
 from . import views
 app_name = 'accounts'
@@ -8,7 +8,7 @@ urlpatterns = [
     
     path('index/', index, name='index'),
     path('registerUser/', registerUser, name='registerUser'),
-    path('registerVendor/', registerVendor, name='registerVendor'),
+    # path('registerVendor/', registerVendor, name='registerVendor'),
 
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),

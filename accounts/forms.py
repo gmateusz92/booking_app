@@ -3,16 +3,18 @@ from .models import User, UserProfile
 from .validators import allow_only_images_validator
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'})) #poniewaz nie mamy w models
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'})) #poniewaz nie mamy w models
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control narrow-input'})) #poniewaz nie mamy w models
+    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control narrow-input'})) #poniewaz nie mamy w models
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'password']
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
+            'username': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
             'email': forms.EmailInput(attrs={'class': 'form-control narrow-input'}),
+            
+            
         }
 
     #non field error

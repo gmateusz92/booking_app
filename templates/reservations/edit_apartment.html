@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+{% if user == apartment.user %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {{ photo_form.as_p }}
+    <button type="submit">Dodaj ofertę</button>
+</form>
+{% else %}
+<!-- Informacja dla użytkownika, że nie ma dostępu do edycji -->
+<p>You do not have permission to edit this apartment.</p>
+{% endif %}
+
+{% endblock %}

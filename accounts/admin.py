@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 
 
 class CustomUserAdmin(UserAdmin): #pasword w admin panel jest nie edytowalne
-    list_display = ('email', 'first_name', 'last_name', 'username', 'role', 'is_active')
+    list_display = ('email', 'first_name', 'last_name', 'username', 'is_active')
     ordering = ('-date_joined',)
     filter_horizontal = ()
     list_filter = ()
