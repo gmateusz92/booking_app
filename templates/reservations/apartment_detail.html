@@ -5,12 +5,8 @@
 
     <title>{{ home.name }} - Home Details</title>
     <!-- Dodaj linki do Bootstrap i innych styli -->
-    
 
 <body>
-
-
-    
     <div class="container mt-5">
         <h1>{{ apartment.name }}</h1>
     
@@ -67,10 +63,11 @@
 
 {% if user == apartment.user %}
 
-edit
-<a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}">Edit</a>
 
 
+<a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-dark">Edit</a>
+    <a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-success">Add new apartment</a>
 {% endif %}
 
 

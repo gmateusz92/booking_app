@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="height: 20vh;">
+    <h2 class="text-center mb-3 " style="font-size: 40px;">Your apartments</h2>
+</div>
+
+
+
+<!-- Aktualizacja pliku my_apartments.html z dodaniem zdjęcia i przycisku -->
+{% for apartment in apartments %}
+<li class="list-group-item">
+    <strong></strong> 
+    
+    <!-- Dodanie małego zdjęcia apartamentu -->
+    {% if apartment.photos.first %}
+        <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }} Image" style="max-width: 500px; max-height: 100px; margin-right: 10px;">
+    {% endif %}
+    
+    <!-- Dodanie przycisku "Check Details" -->
+    <a href="{% url 'reservations:apartment_detail' apartment.id %}" class="btn btn-dark" style="margin-top: 10px;">Check {{ apartment.name }} details</a>
+    
+    <!-- Dodaj inne pola oferty, jakie potrzebujesz -->
+</li>
+{% endfor %}
+
+
+
+{% endblock %}
