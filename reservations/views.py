@@ -6,13 +6,33 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
+from django.db.models import Q
 
-# Create your views here.
+# # Create your views here.
+# def home(request):
+#     apartments = Apartment.objects.all()
+#     context = {
+#         'apartments': apartments,
+#     } 
+#     return render(request, 'home.html', context)
+
 def home(request):
-    apartments = Apartment.objects.all()
+    # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
+    query = request.GET.get('searchLocation', '')
+    
+    # Jeśli formularz został wysłany, szukaj w polu country i city
+    if query:
+        apartments = Apartment.objects.filter(
+            Q(country__icontains=query) | Q(city__icontains=query)
+        )
+    else:
+        # W przeciwnym razie, zwróć wszystkie apartamenty
+        apartments = Apartment.objects.all()
+
     context = {
         'apartments': apartments,
-    } 
+    }
+    
     return render(request, 'home.html', context)
 
 def apartment_detail(request, pk):
@@ -99,6 +119,7 @@ class EditApartmentView(View):
     def post(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
         form = ApartmentForm(request.POST, instance=apartment)
+        photo_form = PhotoForm(request.POST, request.FILES, instance=apartment.photos.first())
 
         if form.is_valid():
             apartment = form.save(commit=False)
@@ -106,7 +127,7 @@ class EditApartmentView(View):
             apartment.save()
 
             # Dodatkowo obsługuje dodawanie zdjęcia
-            photo_form = PhotoForm(request.POST, request.FILES, instance=apartment.photos.first())
+            
             if photo_form.is_valid():
                 photo = photo_form.save(commit=False)
                 photo.apartment = apartment
@@ -157,8 +178,11 @@ class DeleteApartmentView(View):
     def post(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk)
         apartment.delete()
-        return redirect('reservations:apartment_detail')  # Zastąp 'nazwa_twojego_widoku_listy' odpowiednią nazwą
-
+        if Apartment.objects.filter(user=request.user).exists():
+            return redirect('reservations:apartment_list')
+        else:
+            # Jeśli użytkownik nie ma ofert, przekierowujemy na stronę główną
+            return redirect('reservations:home')
 
 def booking_list(request):
     bookings = Booking.objects.all()
@@ -166,3 +190,4 @@ def booking_list(request):
         'bookings': bookings
     }
     return render(request, 'reservations/bookinglist.html', context)
+
