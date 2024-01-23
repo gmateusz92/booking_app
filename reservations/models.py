@@ -1,7 +1,7 @@
 from django.db import models
 from booking import settings
-# from django.contrib.gis.db import models as gis_models
-# from django.contrib.gis.geos import Point
+#from django.contrib.gis.db import models as gis_models
+#from django.contrib.gis.geos import Point
 
 class Apartment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
