@@ -1,5 +1,5 @@
 from django.urls import path
-from. views import home, booking_list, apartment_detail, AddApartmentView, EditApartmentView, DeleteApartmentView, apartment_list  #my_apartment_detail # MyApartmentView, my_apartment_detail #MyApartmentDetailView
+from. views import home, booking_list, apartment_detail, AddApartmentView, EditApartmentView, DeleteApartmentView, apartment_list, search  #my_apartment_detail # MyApartmentView, my_apartment_detail #MyApartmentDetailView
 
 from . import views
 app_name = 'reservations'
@@ -16,6 +16,7 @@ urlpatterns = [
     # # path('apartment/<int:apartment_id>/', MyApartmentDetailView.as_view(), name='MyApartmentDetailView'),
     # path('my_apartment_detail/<int:pk>/', my_apartment_detail, name='my_apartment_detail'),
     path('apartment_list/', apartment_list, name='apartment_list'),
+    path('search/', search, name='search'),
     
     
     

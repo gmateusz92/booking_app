@@ -23,7 +23,7 @@ def home(request):
     # Jeśli formularz został wysłany, szukaj w polu country i city
     if query:
         apartments = Apartment.objects.filter(
-            Q(country__icontains=query) | Q(city__icontains=query)
+            Q(name__icontains=query) | Q(city__icontains=query)
         )
     else:
         # W przeciwnym razie, zwróć wszystkie apartamenty
@@ -32,8 +32,21 @@ def home(request):
     context = {
         'apartments': apartments,
     }
-    
     return render(request, 'home.html', context)
+
+
+def search(request):
+    query = request.GET.get('q')
+    if query:
+        # Wyszukaj apartamenty na podstawie wprowadzonego zapytania
+        apartments = Apartment.objects.filter(city__icontains=query)
+        # Dodaj więcej filtrów według potrzeb
+    else:
+        # Jeśli pasek wyszukiwania jest pusty, zwróć wszystkie apartamenty
+        apartments = Apartment.objects.all()
+
+    return render(request, 'reservations/search_location.html', {'apartments': apartments})
+
 
 def apartment_detail(request, pk):
     apartment = get_object_or_404(Apartment, pk=pk)
