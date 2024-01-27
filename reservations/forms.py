@@ -4,17 +4,19 @@ from .models import Apartment, Photo
 class ApartmentForm(forms.ModelForm):
     class Meta:
         model = Apartment
-        fields = ['name', 'description', 'beds', 'capacity', 'price', 'country', 'city', 'latitude', 'longitude']
+        fields = ['name', 'description', 'beds', 'capacity', 'price', 'address', 'country', 'city', 'latitude', 'longitude', 'location']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
             'description': forms.Textarea(attrs={'class': 'form-control narrow-input'}),
             'beds': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
             'capacity': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
             'price': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
+            'address': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
             'country': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
             'city': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
             'latitude': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
             'longitude': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
+            'location': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
         }
 
 class PhotoForm(forms.ModelForm):

@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'reservations.context_processors.get_google_api',
             ],
             'libraries': {
                 'apartment_tags': 'reservations.templatetags.apartment_tags',
@@ -152,3 +153,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 os.environ['PATH'] = os.path.join(BASE_DIR, 'venv\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
 os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'venv\Lib\site-packages\osgeo\data\proj') + ';' + os.environ['PATH']
 GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'venv\Lib\site-packages\osgeo\gdal304.dll')
+
+
+#GOOGLE_API_KEY = 'AIzaSyAGkOJWRwEPRCvzAeesItLtu6z4lRrwCgs'
+GOOGLE_API_KEY = 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc' #trzeba stworzyc funkcje przekazujacą api key do base html ladowanie scriptu w context processors

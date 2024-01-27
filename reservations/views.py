@@ -8,23 +8,45 @@ from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
 from django.db.models import Q
 
-# # Create your views here.
+
 # def home(request):
-#     apartments = Apartment.objects.all()
+#     # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
+#     query = request.GET.get('q', '')
+    
+#     # Jeśli formularz został wysłany, szukaj w polu country i city
+#     if query:
+#         apartments = Apartment.objects.filter(
+#             Q(country__icontains=query) | Q(city__icontains=query)
+#         )
+#     else:
+#         # W przeciwnym razie, zwróć wszystkie apartamenty
+#         apartments = Apartment.objects.all()
+
 #     context = {
 #         'apartments': apartments,
-#     } 
+#     }
 #     return render(request, 'home.html', context)
 
 def home(request):
     # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
-    query = request.GET.get('searchLocation', '')
-    
-    # Jeśli formularz został wysłany, szukaj w polu country i city
+    query = request.GET.get('q', '')
+
+    # Sprawdź, czy użytkownik użył autouzupełnienia z Google Maps
+    auto_complete_query = request.GET.get('id_address', '')
+
+    # Użyj wartości z autouzupełnienia, jeśli jest dostępna
+    query = auto_complete_query if auto_complete_query else query
+
+    # Jeśli formularz został wysłany, szukaj w polu name, city, country
     if query:
-        apartments = Apartment.objects.filter(
-            Q(name__icontains=query) | Q(city__icontains=query)
-        )
+        keywords = query.split(', ')
+        if len(keywords) >= 1:
+            apartments = Apartment.objects.filter(
+                Q(country__icontains=query) | Q(city__icontains=query) |
+                Q(country__icontains=keywords[0]) | Q(city__icontains=keywords[0])
+            )
+            if len(keywords) >= 2:
+                apartments = apartments.filter(Q(country__icontains=keywords[1]) & Q(city__icontains=keywords[0]))
     else:
         # W przeciwnym razie, zwróć wszystkie apartamenty
         apartments = Apartment.objects.all()
@@ -35,17 +57,59 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-def search(request):
-    query = request.GET.get('q')
-    if query:
-        # Wyszukaj apartamenty na podstawie wprowadzonego zapytania
-        apartments = Apartment.objects.filter(city__icontains=query)
-        # Dodaj więcej filtrów według potrzeb
-    else:
-        # Jeśli pasek wyszukiwania jest pusty, zwróć wszystkie apartamenty
-        apartments = Apartment.objects.all()
+# def home(request):
+#     # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
+#     query = request.GET.get('q', '')
 
-    return render(request, 'reservations/search_location.html', {'apartments': apartments})
+#     # Sprawdź, czy użytkownik użył autouzupełnienia z Google Maps
+#     auto_complete_query = request.GET.get('id_address', '')
+
+#     # Użyj wartości z autouzupełnienia, jeśli jest dostępna
+#     query = auto_complete_query if auto_complete_query else query
+
+#     # Jeśli formularz został wysłany, szukaj w polu name, city, country
+#     if query:
+#         keywords = query.split(', ')
+        
+#         # Sprawdź, czy fraza zawiera przecinek (czyli czy to wynik z Google Maps)
+#         if ',' in query:
+#             # Jeśli tak, użyj pierwszej części jako miasta, a drugiej jako kraju
+#             city_conditions = Q(city__iexact=keywords[0].strip())
+#             country_conditions = Q(country__iexact=keywords[1].strip())
+#         else:
+#             # W przeciwnym razie, traktuj całą frazę jako jeden warunek
+#             city_conditions = Q(city__iexact=query)
+#             country_conditions = Q(country__iexact=query)
+
+#         # Połącz warunki dla kraju i miasta
+#         apartments = Apartment.objects.filter(
+#             Q(name__icontains=query) | Q(description__icontains=query) |
+#             country_conditions | city_conditions
+#         )
+#     else:
+#         # W przeciwnym razie, zwróć wszystkie apartamenty
+#         apartments = Apartment.objects.all()
+
+#     context = {
+#         'apartments': apartments,
+#     }
+#     return render(request, 'home.html', context)
+
+
+
+
+
+# def search(request):
+#     query = request.GET.get('q')
+#     if query:
+#         # Wyszukaj apartamenty na podstawie wprowadzonego zapytania
+#         apartments = Apartment.objects.filter(city__icontains=query)
+#         # Dodaj więcej filtrów według potrzeb
+#     else:
+#         # Jeśli pasek wyszukiwania jest pusty, zwróć wszystkie apartamenty
+#         apartments = Apartment.objects.all()
+
+#     return render(request, 'reservations/search_location.html', {'apartments': apartments})
 
 
 def apartment_detail(request, pk):
