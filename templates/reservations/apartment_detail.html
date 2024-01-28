@@ -37,6 +37,12 @@
                 <div class="card mt-3">
                     <div class="card-body">
                         <h5 class="card-title">Rezerwacja</h5>
+                        {{ calendar }}
+
+                        <div class="text-center mt-3">
+                            <a href="{{ prev_month_url }}" class="btn btn-primary">Poprzedni miesiąc</a>
+                            <a href="{{ next_month_url }}" class="btn btn-primary">Następny miesiąc</a>
+                        </div
                         <!-- Dodaj formularz rezerwacji lub inny element do rezerwacji -->
                     </div>
                 </div>

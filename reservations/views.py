@@ -9,6 +9,12 @@ from django.views.generic.edit import UpdateView
 from django.db.models import Q
 from django.conf import settings
 import googlemaps
+from datetime import datetime, date, timedelta
+from django.utils.safestring import mark_safe
+from .models import *
+from .utils import Calendar
+from django.views.generic import ListView
+from django.urls import reverse
 
 
 def map(request):
@@ -67,60 +73,39 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+# class ApartmentDetailView(DetailView):
+#     model = Apartment
+#     template_name = 'reservations/apartment_detail.html'
 
-# def home(request):
-#     # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
-#     query = request.GET.get('q', '')
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
 
-#     # Sprawdź, czy użytkownik użył autouzupełnienia z Google Maps
-#     auto_complete_query = request.GET.get('id_address', '')
+#         # Pobieramy obiekt daty na podstawie parametru 'day' z żądania
+#         d = get_date(self.request.GET.get('day', None))
 
-#     # Użyj wartości z autouzupełnienia, jeśli jest dostępna
-#     query = auto_complete_query if auto_complete_query else query
+#         # Ustalamy aktualny rok i miesiąc
+#         year, month = d.year, d.month
 
-#     # Jeśli formularz został wysłany, szukaj w polu name, city, country
-#     if query:
-#         keywords = query.split(', ')
-        
-#         # Sprawdź, czy fraza zawiera przecinek (czyli czy to wynik z Google Maps)
-#         if ',' in query:
-#             # Jeśli tak, użyj pierwszej części jako miasta, a drugiej jako kraju
-#             city_conditions = Q(city__iexact=keywords[0].strip())
-#             country_conditions = Q(country__iexact=keywords[1].strip())
-#         else:
-#             # W przeciwnym razie, traktuj całą frazę jako jeden warunek
-#             city_conditions = Q(city__iexact=query)
-#             country_conditions = Q(country__iexact=query)
+#         # Przechodzimy do poprzedniego miesiąca
+#         prev_month = date(year, month, 1) - timedelta(days=1)
+#         prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
 
-#         # Połącz warunki dla kraju i miasta
-#         apartments = Apartment.objects.filter(
-#             Q(name__icontains=query) | Q(description__icontains=query) |
-#             country_conditions | city_conditions
-#         )
-#     else:
-#         # W przeciwnym razie, zwróć wszystkie apartamenty
-#         apartments = Apartment.objects.all()
+#         # Przechodzimy do następnego miesiąca
+#         next_month = date(year, month, 28) + timedelta(days=7)
+#         next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
 
-#     context = {
-#         'apartments': apartments,
-#     }
-#     return render(request, 'home.html', context)
+#         # Instantiate our calendar class with today's year and date
+#         cal = Calendar(year, month)
 
+#         # Call the formatmonth method, which returns our calendar as a table
+#         html_cal = cal.formatmonth(withyear=True)
+#         context['calendar'] = mark_safe(html_cal)
 
+#         # Dodajemy dane nawigacyjne do kontekstu
+#         context['prev_month_url'] = prev_month_url
+#         context['next_month_url'] = next_month_url
 
-
-
-# def search(request):
-#     query = request.GET.get('q')
-#     if query:
-#         # Wyszukaj apartamenty na podstawie wprowadzonego zapytania
-#         apartments = Apartment.objects.filter(city__icontains=query)
-#         # Dodaj więcej filtrów według potrzeb
-#     else:
-#         # Jeśli pasek wyszukiwania jest pusty, zwróć wszystkie apartamenty
-#         apartments = Apartment.objects.all()
-
-#     return render(request, 'reservations/search_location.html', {'apartments': apartments})
+#         return context
 
 
 def apartment_detail(request, pk):
@@ -282,3 +267,48 @@ def booking_list(request):
     }
     return render(request, 'reservations/bookinglist.html', context)
 
+
+
+def get_date(req_day):
+        if req_day:
+            year, month = (int(x) for x in req_day.split('-'))
+            return date(year, month, day=1)
+        return datetime.today()  
+
+
+class CalendarView(ListView):
+    model = Booking
+    template_name = 'reservations/calendar.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Pobieramy obiekt daty na podstawie parametru 'day' z żądania
+        d = get_date(self.request.GET.get('day', None))
+
+        # Ustalamy aktualny rok i miesiąc
+        year, month = d.year, d.month
+
+        # Przechodzimy do poprzedniego miesiąca
+        prev_month = date(year, month, 1) - timedelta(days=1)
+        prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
+
+        # Przechodzimy do następnego miesiąca
+        next_month = date(year, month, 28) + timedelta(days=7)
+        next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
+
+        # Instantiate our calendar class with today's year and date
+        cal = Calendar(year, month)
+
+        # Call the formatmonth method, which returns our calendar as a table
+        html_cal = cal.formatmonth(withyear=True)
+        context['calendar'] = mark_safe(html_cal)
+
+        # Dodajemy dane nawigacyjne do kontekstu
+        context['prev_month_url'] = prev_month_url
+        context['next_month_url'] = next_month_url
+
+        return context
+    
+
+  
