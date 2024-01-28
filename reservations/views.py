@@ -7,7 +7,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
 from django.db.models import Q
+from django.conf import settings
+import googlemaps
 
+
+def map(request):
+    context = {
+        # 'google_maps_api_key': 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc',  # Zastąp kluczem API
+    }
+    return render(request, 'reservations/map.html', context)
 
 # def home(request):
 #     # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
@@ -50,6 +58,9 @@ def home(request):
     else:
         # W przeciwnym razie, zwróć wszystkie apartamenty
         apartments = Apartment.objects.all()
+
+
+
 
     context = {
         'apartments': apartments,
@@ -115,9 +126,12 @@ def home(request):
 def apartment_detail(request, pk):
     apartment = get_object_or_404(Apartment, pk=pk)
     photo = Photo.objects.all()
+    apartments = Apartment.objects.all()
     context = {
         'apartment': apartment,
         'photo': photo,
+        'apartments': apartments,
+        
         }
     return render(request, 'reservations/apartment_detail.html', context)
 

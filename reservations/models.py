@@ -3,6 +3,7 @@ from booking import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db import models as gismodels
+from django_google_maps import fields as map_fields
 
 class Apartment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
@@ -17,6 +18,7 @@ class Apartment(models.Model):
     latitude = models.FloatField(max_length=20, blank=True, null=True)
     longitude = models.FloatField(max_length=20, blank=True, null=True)
     location = gis_models.PointField(null=True, blank=True, srid=4326)
+    geolocation = map_fields.GeoLocationField(max_length=100, null=True)
     
     def __str__(self):
         return f'{self.name} with {self.beds} beds for {self.capacity} people'
@@ -28,13 +30,14 @@ class Apartment(models.Model):
             return super(Apartment, self).save(*args, **kwargs)
         return super(Apartment, self).save(*args, **kwargs)
 
+
+
 class Photo(models.Model):
     apartment = models.ForeignKey(Apartment, related_name='photos', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='static/images/', null=True, blank=True)
     
     def __str__(self):
         return f'{self.image} '
-
 
 
 class Booking(models.Model):

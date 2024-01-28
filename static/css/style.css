@@ -113,3 +113,13 @@
   height: 200px; /* Ustaw stałą wysokość dla mniejszych zdjęć */
   object-fit: cover; /* Skaluj obraz, aby wypełnić wymiary obiektu */
 }
+
+
+.mapholder{
+  height: 500px;
+  width: 100%;
+}
+
+#map{
+  height: 100%;
+}

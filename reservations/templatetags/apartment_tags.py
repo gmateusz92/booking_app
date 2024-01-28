@@ -8,3 +8,5 @@ def if_user_offer_apartment(user):
     if user.is_authenticated:
         return Apartment.objects.filter(user=user).exists()
     return False
+
+

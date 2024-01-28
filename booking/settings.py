@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'reservations',
     'accounts',
     'vendor',
-    'django.contrib.gis'
+    'django.contrib.gis',
+    'django_google_maps',
 ]
 
 MIDDLEWARE = [
@@ -84,7 +85,7 @@ WSGI_APPLICATION = 'booking.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        #'ENGINE': 'django.db.backends.postgresql',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'booking_app',
         'USER': 'postgres',
@@ -156,4 +157,6 @@ GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'venv\Lib\site-packages\osgeo\gdal304
 
 
 #GOOGLE_API_KEY = 'AIzaSyAGkOJWRwEPRCvzAeesItLtu6z4lRrwCgs'
+
 GOOGLE_API_KEY = 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc' #trzeba stworzyc funkcje przekazujacą api key do base html ladowanie scriptu w context processors
+GOOGLE_MAPS_API_KEY = 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc'
