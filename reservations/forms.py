@@ -19,6 +19,7 @@ class ApartmentForm(forms.ModelForm):
             'latitude': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
             'longitude': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
             'location': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
+            
         }
 
 class PhotoForm(forms.ModelForm):

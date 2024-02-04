@@ -3,6 +3,7 @@
 
 
     <style>
+        
       .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
@@ -115,8 +116,8 @@
     
 <main>
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-      <div class="container-fluid py-5">
-        <h1 class="display-5 fw-bold">Custom jumbotron {{ apartment.name }}</h1>
+      <div class="">
+        <h1 class="display-5 fw-bold"> {{ apartment.name }}</h1>
         {% if user == apartment.user %}
         <a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-dark">Edit</a>      
         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>
@@ -150,17 +151,15 @@
                     <!-- Główne zdjęcie -->
                     <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }}" class="img-fluid mb-3 main-photo">
                     <!-- Informacje o domu -->
-                    <h3>Informacje o domu</h3>
+                    <h3>Apartment details</h3>
                     <p><strong>Opis:</strong> {{ apartment.description }}</p>
                     <p><strong>Liczba łóżek:</strong> {{ apartment.beds }}</p>
                     
                     <p><strong>Pojemność:</strong> {{ apartment.capacity }}</p>
-                    <br>
-                    <p><strong>Cena:</strong> {{ apartment.price }} $</p>
-                    <br>
-                    <br>
                     
-                    <br>
+                    <p><strong>Cena:</strong> {{ apartment.price }} $</p>
+                    
+                    
                     
                     <!-- Dodaj skrypty Bootstrap i inne skrypty JS -->
                     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
@@ -168,17 +167,36 @@
                     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
                 </div>
-                
+                <!-- Dodaj bibliotekę Lightbox -->
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" integrity="sha512-...">
+
                 <div class="col-md-4">
                     <!-- 4 mniejsze zdjęcia -->
                     <div class="row">
                         {% for photo in apartment.photos.all %}
-                            <div class="col-md-3 mb-3">
-                                <img src="{{ photo.image.url }}" alt="{{ apartment.name }}" class="img-fluid smallerr-photo">
+                            <div class="col-md-6 mb-4">
+                                <a href="{{ photo.image.url }}" data-lightbox="apartment" data-title="{{ apartment.name }}">
+                                    <img src="{{ photo.image.url }}" alt="{{ apartment.name }}" class="img-fluid smallerr-photo" style="width: 90%; height: 150px; object-fit: cover;">
+                                </a>
                             </div>
                         {% endfor %}
-                        ffff
                     </div>
+                </div>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha512-..."></script>
+
+            <!-- Dodaj bibliotekę Lightbox -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js" integrity="sha512-..."></script>
+
+            <!-- Inicjalizuj Lightbox -->
+            <script>
+                $(document).ready(function () {
+                    lightbox.option({
+                        'resizeDuration': 200,
+                        'wrapAround': true
+                    });
+                });
+            </script>
+
             </div>
             </div>
 

@@ -161,8 +161,6 @@ def apartment_list(request):
     return render(request, 'reservations/my_apartments.html', {'apartments': apartments})
 
 
-        
-
 
 class AddApartmentView(View):
     template_name = 'reservations/add_apartment.html'
@@ -171,7 +169,7 @@ class AddApartmentView(View):
         form = ApartmentForm()
         photo_form = PhotoForm()
         return render(request, self.template_name, {'form': form, 'photo_form': photo_form})
-
+    
     def post(self, request):
         form = ApartmentForm(request.POST)
         photo_form = PhotoForm(request.POST, request.FILES)
@@ -180,11 +178,9 @@ class AddApartmentView(View):
             apartment = form.save(commit=False)
             apartment.user=request.user
             apartment.save()
-
             photo = photo_form.save(commit=False)
             photo.apartment = apartment
             photo.save()
-            
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
         return render(request, self.template_name, {'form': form, 'photo_form': photo_form})    
@@ -193,27 +189,27 @@ class AddApartmentView(View):
 class EditApartmentView(View):
     template_name = 'reservations/edit_apartment.html'
 
+    
+    
     def get(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
         form = ApartmentForm(instance=apartment)
-        return render(request, self.template_name, {'form': form, 'apartment': apartment})
+        photo_form = PhotoForm(instance=apartment.photos.first())
+        return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form})
 
     def post(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
         form = ApartmentForm(request.POST, instance=apartment)
-        photo_form = PhotoForm(request.POST, request.FILES, instance=apartment.photos.first())
+        photo_form = PhotoForm(request.POST, request.FILES)
 
-        if form.is_valid():
+        if form.is_valid() and photo_form.is_valid():
             apartment = form.save(commit=False)
             apartment.user = request.user
             apartment.save()
 
-            # Dodatkowo obsługuje dodawanie zdjęcia
-            
-            if photo_form.is_valid():
-                photo = photo_form.save(commit=False)
-                photo.apartment = apartment
-                photo.save()
+            photo = photo_form.save(commit=False)
+            photo.apartment = apartment
+            photo.save()
 
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
