@@ -1,5 +1,7 @@
 from django import forms
-from .models import Apartment, Photo
+from .models import Apartment, Photo, Booking
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 class ApartmentForm(forms.ModelForm):
     class Meta:
@@ -26,3 +28,38 @@ class PhotoForm(forms.ModelForm):
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'form-control narrow-input'}),
         }
+
+# class ReservationForm(forms.ModelForm):
+#     class Meta:
+#         model = Booking
+#         fields = [ 'check_in', 'check_out', 'name']
+
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['check_in', 'check_out', 'name']
+        widgets = {
+            'check_in': forms.DateInput(attrs={'class': 'form-control narrow-input', 'type': 'date'}),
+            'check_out': forms.DateInput(attrs={'class': 'form-control narrow-input', 'type': 'date'}),
+            'name': forms.HiddenInput(attrs={'required': False})
+        }
+    def clean(self):
+        cleaned_data = super().clean()
+        check_in = cleaned_data.get('check_in')
+        check_out = cleaned_data.get('check_out')
+        name = cleaned_data.get('name')
+
+        if check_in and check_out and name:
+            # Sprawdź, czy istnieje inna rezerwacja w tym terminie dla tego samego apartamentu
+            overlapping_bookings = Booking.objects.filter(
+                name=name,
+                check_out__gt=check_in,
+                check_in__lt=check_out
+            )
+
+            if overlapping_bookings.exists():
+                
+
+                raise ValidationError({'check_in': 'Thiss apartment is already booked for the selected dates.'})
+
+        return cleaned_data

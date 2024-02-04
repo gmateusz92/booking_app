@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Apartment, Booking, Photo
 from django.shortcuts import render, get_object_or_404
-from .forms import ApartmentForm, PhotoForm
+from .forms import ApartmentForm, PhotoForm, BookingForm
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
@@ -15,42 +15,28 @@ from .models import *
 from .utils import Calendar
 from django.views.generic import ListView
 from django.urls import reverse
+from django.http import JsonResponse
+from django.contrib import messages
+
 
 
 def map(request):
+    reservation_form = BookingForm()  # Inicjalizuj formularz rezerwacji
+
     context = {
+        'reservation_form': reservation_form,  # Dodaj formularz do kontekstu
         # 'google_maps_api_key': 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc',  # Zastąp kluczem API
     }
     return render(request, 'reservations/map.html', context)
 
-# def home(request):
-#     # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
-#     query = request.GET.get('q', '')
-    
-#     # Jeśli formularz został wysłany, szukaj w polu country i city
-#     if query:
-#         apartments = Apartment.objects.filter(
-#             Q(country__icontains=query) | Q(city__icontains=query)
-#         )
-#     else:
-#         # W przeciwnym razie, zwróć wszystkie apartamenty
-#         apartments = Apartment.objects.all()
-
-#     context = {
-#         'apartments': apartments,
-#     }
-#     return render(request, 'home.html', context)
 
 def home(request):
     # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
     query = request.GET.get('q', '')
-
     # Sprawdź, czy użytkownik użył autouzupełnienia z Google Maps
     auto_complete_query = request.GET.get('id_address', '')
-
     # Użyj wartości z autouzupełnienia, jeśli jest dostępna
     query = auto_complete_query if auto_complete_query else query
-
     # Jeśli formularz został wysłany, szukaj w polu name, city, country
     if query:
         keywords = query.split(', ')
@@ -64,9 +50,6 @@ def home(request):
     else:
         # W przeciwnym razie, zwróć wszystkie apartamenty
         apartments = Apartment.objects.all()
-
-
-
 
     context = {
         'apartments': apartments,
@@ -108,17 +91,58 @@ def home(request):
 #         return context
 
 
-def apartment_detail(request, pk):
-    apartment = get_object_or_404(Apartment, pk=pk)
-    photo = Photo.objects.all()
-    apartments = Apartment.objects.all()
-    context = {
-        'apartment': apartment,
-        'photo': photo,
-        'apartments': apartments,
+# def apartment_detail(request, pk):
+#     apartment = get_object_or_404(Apartment, pk=pk)
+#     photo = Photo.objects.all()
+#     apartments = Apartment.objects.all()
+#     context = {
+#         'apartment': apartment,
+#         'photo': photo,
+#         'apartments': apartments,
         
+#         }
+#     return render(request, 'reservations/xx.html', context)
+
+
+class ApartmentDetailView(View):
+    template_name = 'reservations/apartment_detail.html'
+
+    def get(self, request, pk):
+        apartment = get_object_or_404(Apartment, pk=pk)
+        photo = Photo.objects.all()
+        apartments = Apartment.objects.all()
+
+        # Dodaj kod dla kalendarza
+        d = get_date(request.GET.get('day', None))
+        year, month = d.year, d.month
+        prev_month = date(year, month, 1) - timedelta(days=1)
+        prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
+        next_month = date(year, month, 28) + timedelta(days=7)
+        next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
+
+        
+        
+        cal = Calendar(year, month, apartment)
+        html_cal = cal.formatmonth(withyear=True)
+
+
+
+
+        # cal = Calendar(year, month)
+        # html_cal = cal.formatmonth(withyear=True)
+
+        context = {
+            'apartment': apartment,
+            'photo': photo,
+            'apartments': apartments,
+            'calendar': mark_safe(html_cal),
+            'prev_month_url': prev_month_url,
+            'next_month_url': next_month_url,
         }
-    return render(request, 'reservations/apartment_detail.html', context)
+
+    
+        return render(request, 'reservations/apartment_detail.html', context)
+    
 
 # class MyApartmentView(LoginRequiredMixin, View):
 #     template_name = 'reservations/my_apartments.html'
@@ -161,27 +185,9 @@ class AddApartmentView(View):
             photo.apartment = apartment
             photo.save()
             
-            return redirect('reservations:apartment_detail', pk=apartment.pk)
+            return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
         return render(request, self.template_name, {'form': form, 'photo_form': photo_form})    
-
-# class EditApartmentView(View):
-#     template_name = 'reservations/edit_apartment.html'
-
-#     def get(self, request, pk):
-#         apartment = get_object_or_404(Apartment, pk=pk)
-#         form = ApartmentForm(instance=apartment)
-#         return render(request, self.template_name, {'form': form, 'apartment': apartment})
-
-#     def post(self, request, pk):
-#         apartment = get_object_or_404(Apartment, pk=pk)
-#         form = ApartmentForm(request.POST, instance=apartment)
-
-#         if form.is_valid():
-#             form.save()
-#             return redirect('reservations:apartment_detail', pk=apartment.pk)
-
-#         return render(request, self.template_name, {'form': form, 'apartment': apartment})
 
 
 class EditApartmentView(View):
@@ -209,7 +215,7 @@ class EditApartmentView(View):
                 photo.apartment = apartment
                 photo.save()
 
-            return redirect('reservations:apartment_detail', pk=apartment.pk)
+            return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form })
 
@@ -279,6 +285,7 @@ def get_date(req_day):
 class CalendarView(ListView):
     model = Booking
     template_name = 'reservations/calendar.html'
+    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -310,5 +317,153 @@ class CalendarView(ListView):
 
         return context
     
+   
+# class CalendarView(View):
+#     template_name = 'reservations/calendar.html'
 
-  
+#     def get(self, request, pk, year, month):
+#         apartment = get_object_or_404(Apartment, pk=pk)
+#         photo = Photo.objects.all()
+#         apartments = Apartment.objects.all()
+
+#         # Oblicz poprzedni i kolejny miesiąc
+#         prev_month = date(year, month, 1) - timedelta(days=1)
+#         next_month = date(year, month, 28) + timedelta(days=7)
+
+#         # Twórz linki do poprzedniego i kolejnego miesiąca z uwzględnieniem apartamentu
+#         prev_month_url = reverse('reservations:calendar', args=[pk, prev_month.year, prev_month.month])
+#         next_month_url = reverse('reservations:calendar', args=[pk, next_month.year, next_month.month])
+
+#         # Twórz kalendarz
+#         cal = Calendar(year, month, apartment)
+#         html_cal = cal.formatmonth(withyear=True)
+
+#         context = {
+#             'apartment': apartment,
+#             'photo': photo,
+#             'apartments': apartments,
+#             'calendar': mark_safe(html_cal),
+#             'prev_month_url': prev_month_url,
+#             'next_month_url': next_month_url,
+#         }
+
+#         return render(request, 'reservations/calendar.html', context)
+    
+
+# class ReserveView(View):
+#     template_name = 'reservations/reserve_apartment.html'
+
+#     def get(self, request, pk):
+#         apartment = get_object_or_404(Apartment, pk=pk)
+
+#         d = get_date(request.GET.get('day', None))
+#         year, month = d.year, d.month
+#         prev_month = date(year, month, 1) - timedelta(days=1)
+#         prev_month_url = reverse('reservations:ReserveView', kwargs={'pk': pk}) + f'?day={prev_month.year}-{prev_month.month}'
+#         next_month = date(year, month, 28) + timedelta(days=7)
+#         next_month_url = reverse('reservations:ReserveView', kwargs={'pk': pk}) + f'?day={next_month.year}-{next_month.month}'
+
+#         cal = Calendar(year, month, apartment)
+#         html_cal = cal.formatmonth(withyear=True)
+
+#         context = {
+#             'apartment': apartment,
+#             'calendar': mark_safe(html_cal),
+#             'prev_month_url': prev_month_url,
+#             'next_month_url': next_month_url,
+#         }
+
+#         return render(request, self.template_name, context)
+    
+#     def post(self, request):
+#         form = ReservationForm(request.POST)
+        
+
+#         if form.is_valid():
+#             booking = form.save(commit=False)
+#             booking.user=request.user
+#             booking.save()
+            
+#             return redirect('reservations:booking_list', pk=booking.pk)
+        
+#         return render(request, self.template_name, {'form': form, 'booking': booking })
+    
+
+
+class BookingView(View):
+    template_name = 'reservations/reserve_apartment.html'
+
+    def get(self, request, pk):
+        apartment = get_object_or_404(Apartment, pk=pk)
+
+        d = get_date(request.GET.get('day', None))
+        year, month = d.year, d.month
+        prev_month = date(year, month, 1) - timedelta(days=1)
+        prev_month_url = reverse('reservations:BookingView', kwargs={'pk': pk}) + f'?day={prev_month.year}-{prev_month.month}'
+        next_month = date(year, month, 28) + timedelta(days=7)
+        next_month_url = reverse('reservations:BookingView', kwargs={'pk': pk}) + f'?day={next_month.year}-{next_month.month}'
+
+        cal = Calendar(year, month, apartment)
+        html_cal = cal.formatmonth(withyear=True)
+        form = BookingForm(initial={'name': apartment.id})  # Ustawia wartość ukrytego pola
+
+        context = {
+            'apartment': apartment,
+            'calendar': mark_safe(html_cal),
+            'prev_month_url': prev_month_url,
+            'next_month_url': next_month_url,
+            'form': form,  # Dodaj formularz do kontekstu widoku
+        }
+
+        return render(request, self.template_name, context)
+    
+    def post(self, request, pk):
+        apartment = get_object_or_404(Apartment, pk=pk)
+        form = BookingForm(request.POST)
+
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.user = request.user
+            booking.apartment = apartment  # Dodaj przypisanie apartamentu do rezerwacji
+            booking.save()
+            return redirect('reservations:booking_list')
+        else:
+            # form.errors.clear()
+            messages.error(request, form.errors['check_in'])
+        
+        d = get_date(request.GET.get('day', None))
+        year, month = d.year, d.month
+        prev_month = date(year, month, 1) - timedelta(days=1)
+        prev_month_url = reverse('reservations:BookingView', kwargs={'pk': pk}) + f'?day={prev_month.year}-{prev_month.month}'
+        next_month = date(year, month, 28) + timedelta(days=7)
+        next_month_url = reverse('reservations:BookingView', kwargs={'pk': pk}) + f'?day={next_month.year}-{next_month.month}'
+
+        cal = Calendar(year, month, apartment)
+        html_cal = cal.formatmonth(withyear=True)
+
+        context = {
+            'apartment': apartment,
+            'calendar': mark_safe(html_cal),
+            'prev_month_url': prev_month_url,
+            'next_month_url': next_month_url,
+            'form': form,
+        }
+
+        return render(request, self.template_name, context)
+
+
+class DeleteBookingView(View):
+    template_name = 'reservations/delete_booking.html'
+
+    def get(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        return render(request, self.template_name, {'booking': booking})
+
+    def post(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        booking.delete()
+        if Booking.objects.filter(user=request.user).exists():
+            return redirect('reservations:booking_list')
+        else:
+            # Jeśli użytkownik nie ma rezerwacji, przekierowujemy na stronę główną
+            return redirect('reservations:home')

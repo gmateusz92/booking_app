@@ -40,7 +40,12 @@
 
 
     {{ calendar }}
-
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{ photo_form.as_p }}
+        <button type="submit" class="btn btn-dark">Update</button>
+    </form>
     <div class="text-center mt-3">
         <a href="{{ prev_month_url }}" class="btn btn-primary">Poprzedni miesiąc</a>
         <a href="{{ next_month_url }}" class="btn btn-primary">Następny miesiąc</a>

@@ -29,4 +29,10 @@
     <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&callback=initMap" async defer></script>
 </body>
 </html>
+
+<form method="post" action="{% url 'reservations:calendar' %}">
+    {% csrf_token %}
+    {{ reservation_form.as_p }}
+    <input type="submit" value="Reserve">
+  </form>
 {% endblock content %}

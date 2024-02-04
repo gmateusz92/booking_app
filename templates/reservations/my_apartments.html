@@ -17,7 +17,7 @@
     {% endif %}
     
     <!-- Dodanie przycisku "Check Details" -->
-    <a href="{% url 'reservations:apartment_detail' apartment.id %}" class="btn btn-dark" style="margin-top: 10px;">Check {{ apartment.name }} details</a>
+    <a href="{% url 'reservations:ApartmentDetailView' apartment.id %}" class="btn btn-dark" style="margin-top: 10px;">Check {{ apartment.name }} details</a>
     
     <!-- Dodaj inne pola oferty, jakie potrzebujesz -->
 </li>

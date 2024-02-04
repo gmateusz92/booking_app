@@ -2,139 +2,251 @@
 {% block content %}
 
 
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
 
-    <title>{{ home.name }} - Home Details</title>
-    <!-- Dodaj linki do Bootstrap i innych styli -->
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
 
-<body>
-    <div class="container mt-5">
-        <h1>{{ apartment.name }}</h1>
-    
-        <div class="row">
-            <div class="col-md-8">
-                <!-- Główne zdjęcie -->
-                <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }}" class="img-fluid mb-3 main-photo">
-    
-                <!-- Informacje o domu -->
-                <h3>Informacje o domu</h3>
-                <p><strong>Opis:</strong> {{ apartment.description }}</p>
-                <p><strong>Liczba łóżek:</strong> {{ apartment.beds }}</p>
-                <p><strong>Pojemność:</strong> {{ apartment.capacity }}</p>
-                <p><strong>Cena:</strong> {{ apartment.price }} $</p>
-            </div>
-    
-            <div class="col-md-4">
-                <!-- 4 mniejsze zdjęcia -->
-                <div class="row">
-                    {% for photo in apartment.photos.all %}
-                        <div class="col-md-3 mb-3">
-                            <img src="{{ photo.image.url }}" alt="{{ apartment.name }}" class="img-fluid smallerr-photo">
-                        </div>
-                    {% endfor %}
-                </div>
-    
-                <!-- Okno do rezerwacji -->
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Rezerwacja</h5>
-                        {{ calendar }}
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
 
-                        <div class="text-center mt-3">
-                            <a href="{{ prev_month_url }}" class="btn btn-primary">Poprzedni miesiąc</a>
-                            <a href="{{ next_month_url }}" class="btn btn-primary">Następny miesiąc</a>
-                        </div
-                        <!-- Dodaj formularz rezerwacji lub inny element do rezerwacji -->
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+
+      .bd-mode-toggle .dropdown-menu .active .bi {
+        display: block !important;
+      }
+    </style>
+
+<style>
+    .calendar {
+        width: 40%;
+        border-collapse: collapse;
+    }
+
+    .calendar td {
+        border: 5px solid #ddd;
+        padding: 1px;
+        text-align: center;
+        vertical-align: top;
+        
+    }
+    .date {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .reservation {
+        background-color: red;
+        padding: 10px;
+        margin-bottom: 5px;
+        color: white;
+    }
+
+    .calendar-cell {
+    width: 70px;  /* Dostosuj szerokość według potrzeb */
+    height: 50px;
+}
+</style>
+    
+<main>
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+      <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Custom jumbotron {{ apartment.name }}</h1>
+        {% if user == apartment.user %}
+        <a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-dark">Edit</a>      
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete the apartment "{{ apartment.name }}"?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <form method="post" action="{% url 'reservations:DeleteApartmentView' pk=apartment.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        <a href="{% url 'reservations:AddApartmentView' %}" class="btn btn-success">Add new apartment</a>
+        <p class="col-md-8 fs-4"> </p>
+        {% endif %}
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Główne zdjęcie -->
+                    <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }}" class="img-fluid mb-3 main-photo">
+                    <!-- Informacje o domu -->
+                    <h3>Informacje o domu</h3>
+                    <p><strong>Opis:</strong> {{ apartment.description }}</p>
+                    <p><strong>Liczba łóżek:</strong> {{ apartment.beds }}</p>
+                    
+                    <p><strong>Pojemność:</strong> {{ apartment.capacity }}</p>
+                    <br>
+                    <p><strong>Cena:</strong> {{ apartment.price }} $</p>
+                    <br>
+                    <br>
+                    
+                    <br>
+                    
+                    <!-- Dodaj skrypty Bootstrap i inne skrypty JS -->
+                    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
-    <style>
-        .smallerr-photo {
-        width: 100%;  /* Pełna szerokość */
-        height: auto; /* Proporcjonalna wysokość */
-        max-height: 400px;  /* Maksymalna wysokość dla mniejszych zdjęć */
-        }
-    </style>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- 4 mniejsze zdjęcia -->
+                    <div class="row">
+                        {% for photo in apartment.photos.all %}
+                            <div class="col-md-3 mb-3">
+                                <img src="{{ photo.image.url }}" alt="{{ apartment.name }}" class="img-fluid smallerr-photo">
+                            </div>
+                        {% endfor %}
+                        ffff
+                    </div>
+            </div>
+            </div>
 
-<!-- Dodaj skrypty Bootstrap i inne skrypty JS -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+            <div class="row align-items-md-stretch">
+            <div class="col-md-6">
+                <div class="h-100 p-5 text-bg-dark rounded-3">
+                <h2>Check location</h2>
+                
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Simple Map</title>
+                </head>
+                <body>
+                    <div id="map" style="height: 400px; width: 100%;"></div>     
+                <script>
+                    function initMap() {
+                        var apartmentLatLng = {lat: {{ apartment.latitude }}, lng: {{ apartment.longitude }}};
+                        var map = new google.maps.Map(document.getElementById('map'), {
+                            center: apartmentLatLng,
+                            zoom: 11
+                        });
+                        var marker = new google.maps.Marker({
+                            position: apartmentLatLng,
+                            map: map,
+                            title: '{{ apartment.name }}'
+                        });
+                    }
+                </script>
+                <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&callback=initMap" async defer></script>
+                </body>
 
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+            <div class="col-md-6">
+                <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                <h2>Check availability and reserve</h2>
+                <a href="{% url 'reservations:BookingView' pk=apartment.pk %}" class="btn btn-primary">Click and reserve</a>
+                
+                    
+                {% else %}        
+                      You have to be login to reserve apartment.
+                {% endif %}        
+                        
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
 
-</body>
+  
+  </div>
+</main>
+<script src="/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
+    </body>
 </html>
 
-{% if user == apartment.user %}
 
-<a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-dark">Edit</a>      
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">
-        Delete
-    </button>
-<a href="{% url 'reservations:AddApartmentView' %}" class="btn btn-success">Add new apartment</a>
-
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete the apartment "{{ apartment.name }}"?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <form method="post" action="{% url 'reservations:DeleteApartmentView' pk=apartment.pk %}" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-         
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Map</title>
-</head>
-<body>
-    <div id="map" style="height: 400px; width: 100%;"></div>     
-<script>
-    function initMap() {
-        var apartmentLatLng = {lat: {{ apartment.latitude }}, lng: {{ apartment.longitude }}};
-        var map = new google.maps.Map(document.getElementById('map'), {
-            center: apartmentLatLng,
-            zoom: 11
-        });
-        var marker = new google.maps.Marker({
-            position: apartmentLatLng,
-            map: map,
-            title: '{{ apartment.name }}'
-        });
-    }
-</script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&callback=initMap" async defer></script>
-</body>
-
-
-
-
-
-
-
-{% endif %}
 
 
 {% endblock %}

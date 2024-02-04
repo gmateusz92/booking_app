@@ -38,9 +38,11 @@
                     <a class="nav-link" href="{% url 'reservations:apartment_list'  %}">My Offers</a>
                 </li>
                 {% endif %}
+                {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'reservations:booking_list' %}">Booking list</a>
                 </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'reservations:calendar' %}">Calendar</a>
                 </li>

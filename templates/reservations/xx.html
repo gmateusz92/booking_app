@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{ apartment.name }} Details</h1>
+
+  <div>
+    <!-- Dodaj wszystkie informacje o apartamencie, które chcesz wyświetlić -->
+    <p>Description: {{ apartment.description }}</p>
+    <p>Beds: {{ apartment.beds }}</p>
+    <!-- ... inne informacje o apartamencie -->
+
+    <!-- Wyświetl kalendarz -->
+    {{ calendar|safe }}
+  </div>
+
+  <!-- Dodaj inne sekcje, takie jak galeria zdjęć itp. -->
+
+{% endblock %}

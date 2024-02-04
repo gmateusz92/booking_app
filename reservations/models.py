@@ -47,7 +47,9 @@ class Booking(models.Model):
     check_out = models.DateTimeField(null=True)
 
     def __str__(self):
-        return f'{self.user} has booked {self.name} from {self.check_in} to {self.check_out}'
+        formatted_check_in = self.check_in.strftime('%d-%m-%Y')
+        formatted_check_out = self.check_out.strftime('%d-%m-%Y')
+        return f'{self.user} has booked {self.name} from {formatted_check_in} to {formatted_check_out}'
 
 #     def get_room_category(self): #funkcja pokazuje cala nazwe katerogii pokoju
 #         room_categories = dict(self.room.ROOM_CATEGORIES)

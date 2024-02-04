@@ -1,5 +1,5 @@
 from django.urls import path
-from. views import home, booking_list, apartment_detail,  AddApartmentView, EditApartmentView, DeleteApartmentView, apartment_list , map, CalendarView  #ApartmentDetailView #search  my_apartment_detail # MyApartmentView, my_apartment_detail #MyApartmentDetailView
+from. views import home, booking_list, ApartmentDetailView,  AddApartmentView, EditApartmentView, DeleteApartmentView, apartment_list , map, CalendarView, BookingView , DeleteBookingView#, apartment_detail, # #search  my_apartment_detail # MyApartmentView, my_apartment_detail #MyApartmentDetailView
 
 from . import views
 app_name = 'reservations'
@@ -8,8 +8,8 @@ urlpatterns = [
     path('', home, name='home'),
     
 
-    #path('apartment/<int:pk>/', ApartmentDetailView.as_view(), name='ApartmentDetailView'),
-    path('apartment/<int:pk>/', apartment_detail, name='apartment_detail'),
+    path('apartment/<int:pk>/', ApartmentDetailView.as_view(), name='ApartmentDetailView'),
+    # path('apartment/<int:pk>/', apartment_detail, name='apartment_detail'),
     path('booking_list', booking_list, name='booking_list'),
     path('add_apartment', AddApartmentView.as_view(), name='AddApartmentView'),
     path('edit_apartment/<int:pk>', EditApartmentView.as_view(), name='EditApartmentView'),
@@ -20,7 +20,11 @@ urlpatterns = [
     path('apartment_list/', apartment_list, name='apartment_list'),
     # path('search/', search, name='search'),
     path('map', map, name="map"),
-    path('calendar/', CalendarView.as_view(), name='calendar'),
+    # path('apartment/<int:pk>/calendar', CalendarView.as_view(), name='calendar'),
+    path('calendar', CalendarView.as_view(), name='calendar'),
+    path('apartment/<int:pk>/reserve/', BookingView.as_view(), name='BookingView'),
+    path('delete_booking/<int:pk>', DeleteBookingView.as_view(), name='DeleteBookingView'),
+
     
     
     

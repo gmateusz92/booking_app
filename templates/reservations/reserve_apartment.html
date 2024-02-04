@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-md-6">
+    <div class="h-100 p-5 bg-body-tertiary border rounded-3">
+        
+        <div class="card mt-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">Month</h5>
+                <div class="mx-auto">
+                    {{ calendar }}
+                </div>
+                <div class="mt-3">
+                    <a href="{{ prev_month_url }}" class="btn btn-primary">Poprzedni miesiąc</a>
+                    <a href="{{ next_month_url }}" class="btn btn-primary">Następny miesiąc</a>
+                </div>
+                
+                <!-- Dodaj formularz rezerwacji z polem daty -->
+                <form method="post" action="{% url 'reservations:BookingView' pk=apartment.pk %}">
+                    {% csrf_token %}
+                    {% if form.errors.check_in %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.errors.check_in }}
+                        </div>
+                    {% endif %}
+                    {{ form }}
+                    <input type="submit" class="btn btn-success" value="Reserve">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
