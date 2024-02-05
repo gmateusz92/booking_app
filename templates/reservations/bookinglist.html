@@ -5,6 +5,7 @@
 <ul>
     {% for booking in bookings %}
         <li>{{ booking }}</li> <a href="{% url 'reservations:DeleteBookingView' pk=booking.pk %}" class="btn btn-success">Delete</a>
+        
     {% endfor %}
 </ul>
 

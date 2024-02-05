@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Czat z {{ wlasciciel_apartamentu.username }}</title>
+</head>
+<body>
+    <h2>Czat z {{ wlasciciel_apartamentu.username }}</h2>
+    <div id="wiadomosci">
+        {% for wiadomosc in wiadomosci %}
+            <p>{{ wiadomosc.nadawca.username }}: {{ wiadomosc.tresc }}</p>
+        {% endfor %}
+    </div>
+    <form id="formularz-czatu">
+        <input type="text" id="tresc" placeholder="Napisz wiadomość">
+        <input type="submit" value="Wyślij">
+    </form>
+
+    <script>
+        document.getElementById('formularz-czatu').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var tresc = document.getElementById('tresc').value;
+            
+            fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: 'tresc=' + encodeURIComponent(tresc)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    document.getElementById('wiadomosci').innerHTML += '<p>{{ request.user.username }}: ' + tresc + '</p>';
+                    document.getElementById('tresc').value = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}
