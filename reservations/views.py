@@ -17,6 +17,7 @@ from django.views.generic import ListView
 from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -262,8 +263,10 @@ class DeleteApartmentView(View):
             # Jeśli użytkownik nie ma ofert, przekierowujemy na stronę główną
             return redirect('reservations:home')
 
+@login_required
 def booking_list(request):
-    bookings = Booking.objects.all()
+    user=request.user
+    bookings = Booking.objects.filter(user=user)
     context = {
         'bookings': bookings
     }
@@ -465,48 +468,49 @@ class DeleteBookingView(View):
             return redirect('reservations:home')
         
 
-def czat(request, pk):
-    apartment = get_object_or_404(Apartment, id=pk)
-    owner = apartment.user
-    booking = get_object_or_404(Booking, user=request.user, name=apartment)
+# def czat(request, pk):
+#     apartment = get_object_or_404(Apartment, id=pk)
+#     owner = apartment.user
+#     booking = get_object_or_404(Booking, user=request.user, name=apartment)
 
-    if request.method == 'POST':
-        text = request.POST.get('text')
-        message = Message.objects.create(sender=request.user, receiver=owner, text=text)
-        return JsonResponse({'status': 'ok'})
+#     if request.method == 'POST':
+#         text = request.POST.get('text')
+#         message = Message.objects.create(sender=request.user, receiver=owner, text=text)
+#         return JsonResponse({'status': 'ok'})
 
-    messages = Message.objects.filter(
-        (models.Q(nadawca=request.user, odbiorca=owner)) | (models.Q(nadawca=owner, odbiorca=request.user))
-    ).order_by('data')
+#     messages = Message.objects.filter(
+#         (models.Q(nadawca=request.user, odbiorca=owner)) | (models.Q(nadawca=owner, odbiorca=request.user))
+#     ).order_by('data')
 
-    return render(request, 'czat.html', {'wlasciciel_apartamentu': owner, 'wiadomosci': messages, 'booking': booking})        
+#     return render(request, 'czat.html', {'wlasciciel_apartamentu': owner, 'wiadomosci': messages, 'booking': booking})        
 
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import MultipleObjectsReturned
+from django.http import JsonResponse
+from .models import Apartment, Booking, Message
 
-
-
-def czat(request, apartment_id):
-    apartment = get_object_or_404(Apartment, id=apartment_id)
+def czat(request, pk):
+    apartment = get_object_or_404(Apartment, pk=pk)
     owner = apartment.user
+    booking = None
 
     try:
         booking = Booking.objects.get(user=request.user, name=apartment)
     except Booking.DoesNotExist:
-        booking = None
-    except MultipleObjectsReturned:
-        # Handle the case when there are multiple bookings for the same user and apartment
-        # You can choose an appropriate action here, like taking the first one
+        pass
+    except Booking.MultipleObjectsReturned:
         booking = Booking.objects.filter(user=request.user, name=apartment).first()
 
     if request.method == 'POST':
         text = request.POST.get('text')
-        message = Message.objects.create(sender=request.user, receiver=owner, text=text)
-        return JsonResponse({'status': 'ok'})
+        if text:
+            message = Message.objects.create(sender=request.user, receiver=owner, text=text)
+            return redirect('reservations:czat', pk=pk)
+            #return JsonResponse({'status': 'ok'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Text field is empty'})
 
     messages = Message.objects.filter(
         (models.Q(sender=request.user, receiver=owner)) | (models.Q(sender=owner, receiver=request.user))
     ).order_by('date')
 
-    return render(request, 'reservations/czat.html', {'wlasciciel_apartamentu': owner, 'wiadomosci': messages, 'booking': booking})
+    return render(request, 'reservations/czat.html', {'owner': owner, 'messages': messages, 'booking': booking})

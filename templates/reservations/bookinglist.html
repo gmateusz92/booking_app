@@ -2,12 +2,20 @@
 {% block content %}
 
 
-<ul>
-    {% for booking in bookings %}
-        <li>{{ booking }}</li> <a href="{% url 'reservations:DeleteBookingView' pk=booking.pk %}" class="btn btn-success">Delete</a>
-        
-    {% endfor %}
-</ul>
+
+
+{% if bookings %}
+    <ul>
+        {% for booking in bookings %}
+            <li>{{ booking }}</li>
+            <a href="{% url 'reservations:DeleteBookingView' pk=booking.pk %}" class="btn btn-success">Delete</a>
+            <a href="{% url 'reservations:czat' pk=booking.name.pk %}" class="btn btn-success">czat</a>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No bookings available.</p>
+{% endif %}
+
 
 
 
