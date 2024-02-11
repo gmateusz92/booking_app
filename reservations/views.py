@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Apartment, Booking, Photo, Message
+from .models import Apartment, Booking, Photo, Message, Booking_notification
 from django.shortcuts import render, get_object_or_404
 from .forms import ApartmentForm, PhotoForm, BookingForm
 from django.views import View
@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 
 
 
@@ -57,53 +58,6 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
-# class ApartmentDetailView(DetailView):
-#     model = Apartment
-#     template_name = 'reservations/apartment_detail.html'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-
-#         # Pobieramy obiekt daty na podstawie parametru 'day' z żądania
-#         d = get_date(self.request.GET.get('day', None))
-
-#         # Ustalamy aktualny rok i miesiąc
-#         year, month = d.year, d.month
-
-#         # Przechodzimy do poprzedniego miesiąca
-#         prev_month = date(year, month, 1) - timedelta(days=1)
-#         prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
-
-#         # Przechodzimy do następnego miesiąca
-#         next_month = date(year, month, 28) + timedelta(days=7)
-#         next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
-
-#         # Instantiate our calendar class with today's year and date
-#         cal = Calendar(year, month)
-
-#         # Call the formatmonth method, which returns our calendar as a table
-#         html_cal = cal.formatmonth(withyear=True)
-#         context['calendar'] = mark_safe(html_cal)
-
-#         # Dodajemy dane nawigacyjne do kontekstu
-#         context['prev_month_url'] = prev_month_url
-#         context['next_month_url'] = next_month_url
-
-#         return context
-
-
-# def apartment_detail(request, pk):
-#     apartment = get_object_or_404(Apartment, pk=pk)
-#     photo = Photo.objects.all()
-#     apartments = Apartment.objects.all()
-#     context = {
-#         'apartment': apartment,
-#         'photo': photo,
-#         'apartments': apartments,
-        
-#         }
-#     return render(request, 'reservations/xx.html', context)
-
 
 class ApartmentDetailView(View):
     template_name = 'reservations/apartment_detail.html'
@@ -121,12 +75,8 @@ class ApartmentDetailView(View):
         next_month = date(year, month, 28) + timedelta(days=7)
         next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
 
-        
-        
         cal = Calendar(year, month, apartment)
         html_cal = cal.formatmonth(withyear=True)
-
-
 
 
         # cal = Calendar(year, month)
@@ -191,7 +141,6 @@ class EditApartmentView(View):
     template_name = 'reservations/edit_apartment.html'
 
     
-    
     def get(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
         form = ApartmentForm(instance=apartment)
@@ -217,35 +166,6 @@ class EditApartmentView(View):
         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form })
 
 
-# def edit_apartment(request, apartment_id):
-#     user = request.user
-#     apartment = get_object_or_404(Apartment, id=apartment_id, user=user)
-
-#     if request.method == 'POST':
-#         apartment_form = ApartmentForm(request.POST, instance=apartment)
-#         photo_form = PhotoForm(request.POST, request.FILES, instance=apartment.photos.first())
-
-#         if apartment_form.is_valid() and photo_form.is_valid():
-#             apartment = apartment_form.save(commit=False)
-#             apartment.user = user
-#             apartment.save()
-
-#             # Obsługa dodawania zdjęcia
-#             if 'image' in request.FILES:
-#                 photo = photo_form.save(commit=False)
-#                 photo.apartment = apartment
-#                 photo.save()
-
-#             return redirect('reservations:my_apartment_detail', apartment_id=apartment.id)
-#     else:
-#         apartment_form = ApartmentForm(instance=apartment)
-#         photo_form = PhotoForm(instance=apartment.photos.first())
-
-#     return render(request, 'reservations/edit_apartment.html', {
-#         'apartment_form': apartment_form,
-#         'photo_form': photo_form,
-#         'apartment': apartment,
-#     })   
 
 class DeleteApartmentView(View):
     template_name = 'reservations/delete_apartment.html'
@@ -425,6 +345,19 @@ class BookingView(View):
             booking.user = request.user
             booking.apartment = apartment  # Dodaj przypisanie apartamentu do rezerwacji
             booking.save()
+
+             # Wysyłanie wiadomości e-mailowej do użytkownika
+            user_subject = 'Potwierdzenie Twojej rezerwacji'
+            user_message = f'Witaj {request.user.username},\n\nTwoja rezerwacja dla {apartment.name} została potwierdzona.'
+            user_recipient_email = request.user.email
+            send_mail(user_subject, user_message, None, [user_recipient_email])
+
+            # Wysyłanie wiadomości e-mailowej do właściciela apartamentu
+            owner_subject = 'Nowa rezerwacja dla Twojego apartamentu'
+            owner_message = f'Właśnie dokonano nowej rezerwacji dla Twojego apartamentu {apartment.name}.'
+            owner_recipient_email = apartment.user.email
+            send_mail(owner_subject, owner_message, None, [owner_recipient_email])
+
             return redirect('reservations:booking_list')
         else:
             # form.errors.clear()
@@ -484,33 +417,89 @@ class DeleteBookingView(View):
 
 #     return render(request, 'czat.html', {'wlasciciel_apartamentu': owner, 'wiadomosci': messages, 'booking': booking})        
 
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from .models import Apartment, Booking, Message
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Booking, Message
 
-def czat(request, pk):
-    apartment = get_object_or_404(Apartment, pk=pk)
-    owner = apartment.user
-    booking = None
-
-    try:
-        booking = Booking.objects.get(user=request.user, name=apartment)
-    except Booking.DoesNotExist:
-        pass
-    except Booking.MultipleObjectsReturned:
-        booking = Booking.objects.filter(user=request.user, name=apartment).first()
-
+@login_required
+def send_message(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id)
+    
     if request.method == 'POST':
-        text = request.POST.get('text')
-        if text:
-            message = Message.objects.create(sender=request.user, receiver=owner, text=text)
-            return redirect('reservations:czat', pk=pk)
-            #return JsonResponse({'status': 'ok'})
+        content = request.POST.get('content')
+        sender = request.user
+        receiver = booking.name.user  # Właściciel mieszkania
+        apartment_id = booking.name.id  # Pobranie identyfikatora mieszkania
+        new_message = Message.objects.create(sender=sender, receiver=receiver, booking=booking, apartment_id=apartment_id, content=content)
+        return redirect('reservations:inbox')  # Przekierowanie do skrzynki odbiorczej
+    
+    return render(request, 'reservations/send_message.html', {'booking': booking})
+
+# @login_required
+# def inbox(request):
+#     received_messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+#     return render(request, 'reservations/inbox.html', {'received_messages': received_messages})
+
+# @login_required
+# def inbox(request):
+#     received_messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+#     # Pobranie wszystkich rezerwacji, które są powiązane z otrzymanymi wiadomościami
+#     related_bookings = Booking.objects.filter(message__in=received_messages).distinct()
+
+#     return render(request, 'reservations/inbox.html', {'received_messages': received_messages, 'related_bookings': related_bookings})
+
+
+# @login_required
+# def reply(request):
+#     if request.method == 'POST':
+#         content = request.POST.get('content')
+#         booking_id = request.POST.get('booking_id')
+        
+#         if content and booking_id:
+#             booking = get_object_or_404(Booking, pk=booking_id)
+#             sender = request.user
+#             receiver = booking.user  # Użytkownik, który dokonał rezerwacji
+#             apartment_id = booking.name.id  # Pobranie identyfikatora mieszkania
+#             new_message = Message.objects.create(sender=sender, receiver=receiver, booking=booking, apartment_id=apartment_id, content=content)
+#             messages.success(request, 'Your reply has been sent.')
+#             return redirect('reservations:inbox')
+#         else:
+#             messages.error(request, 'Failed to send reply. Please provide both content and booking ID.')
+#             return redirect('reservations:inbox')
+#     else:
+#         messages.error(request, 'Invalid request method.')
+#         return redirect('reservations:inbox')
+
+@login_required
+@login_required
+def inbox(request):
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        booking_id = request.POST.get('booking_id')
+        
+        print("Content:", content)  # Dodaj punkt kontrolny
+        print("Booking ID:", booking_id)  # Dodaj punkt kontrolny
+        
+        if content and booking_id:
+            booking = get_object_or_404(Booking, pk=booking_id)
+            print("Booking:", booking)  # Dodaj punkt kontrolny
+            
+            sender = request.user
+            receiver = booking.user
+            apartment_id = booking.name.id
+            print("Sender:", sender)  # Dodaj punkt kontrolny
+            print("Receiver:", receiver)  # Dodaj punkt kontrolny
+            print("Apartment ID:", apartment_id)  # Dodaj punkt kontrolny
+            
+            new_message = Message.objects.create(sender=sender, receiver=receiver, booking=booking, apartment_id=apartment_id, content=content)
+            messages.success(request, 'Your reply has been sent.')
+            return redirect('reservations:inbox')
         else:
-            return JsonResponse({'status': 'error', 'message': 'Text field is empty'})
-
-    messages = Message.objects.filter(
-        (models.Q(sender=request.user, receiver=owner)) | (models.Q(sender=owner, receiver=request.user))
-    ).order_by('date')
-
-    return render(request, 'reservations/czat.html', {'owner': owner, 'messages': messages, 'booking': booking})
+            messages.error(request, 'Failed to send reply. Please provide both content and booking ID.')
+            return redirect('reservations:inbox')
+    else:
+        received_messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+        related_bookings = Booking.objects.filter(message__in=received_messages).distinct()
+        print("Received Messages:", received_messages)  # Dodaj punkt kontrolny
+        print("Related Bookings:", related_bookings)  # Dodaj punkt kontrolny
+        return render(request, 'reservations/inbox.html', {'received_messages': received_messages, 'related_bookings': related_bookings})

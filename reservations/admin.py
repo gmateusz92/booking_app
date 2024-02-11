@@ -9,6 +9,7 @@ admin.site.register(Booking)
 admin.site.register(Photo)
 admin.site.register(Message)
 
+
 class RentalAdmin(admin.ModelAdmin):
     formfield_overrides = {
         map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},

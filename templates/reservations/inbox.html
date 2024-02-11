@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbox</title>
+</head>
+<body>
+    <h1>Inbox</h1>
+    <ul>
+        {% for message in received_messages %}
+            <li>
+                <strong>From:</strong> {{ message.sender }}<br>
+                <strong>Message:</strong> {{ message.content }}<br>
+                <strong>Date:</strong> {{ message.timestamp }}
+                {% if message.replies.all %}
+                    <ul>
+                        {% for reply in message.replies.all %}
+                            <li>
+                                <strong>From:</strong> {{ reply.sender }}<br>
+                                <strong>Message:</strong> {{ reply.content }}<br>
+                                <strong>Date:</strong> {{ reply.timestamp }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No messages</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reply to Message</title>
+</head>
+<body>
+    <h1>Reply to Message</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="booking_id" value="{{ booking_id }}">
+        <textarea name="content" rows="4" cols="50"></textarea><br>
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>
