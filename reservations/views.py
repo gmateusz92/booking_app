@@ -192,7 +192,14 @@ def booking_list(request):
     }
     return render(request, 'reservations/bookinglist.html', context)
 
-
+@login_required
+def message_list(request):
+    user=request.user
+    bookings = Booking.objects.filter(user=user)
+    context = {
+        'bookings': bookings
+    }
+    return render(request, 'reservations/all_messages.html', context)
 
 def get_date(req_day):
         if req_day:
@@ -346,17 +353,17 @@ class BookingView(View):
             booking.apartment = apartment  # Dodaj przypisanie apartamentu do rezerwacji
             booking.save()
 
-             # Wysyłanie wiadomości e-mailowej do użytkownika
-            user_subject = 'Potwierdzenie Twojej rezerwacji'
-            user_message = f'Witaj {request.user.username},\n\nTwoja rezerwacja dla {apartment.name} została potwierdzona.'
-            user_recipient_email = request.user.email
-            send_mail(user_subject, user_message, None, [user_recipient_email])
+            #  # Wysyłanie wiadomości e-mailowej do użytkownika
+            # user_subject = 'Potwierdzenie Twojej rezerwacji'
+            # user_message = f'Witaj {request.user.username},\n\nTwoja rezerwacja dla {apartment.name} została potwierdzona.'
+            # user_recipient_email = request.user.email
+            # send_mail(user_subject, user_message, None, [user_recipient_email])
 
-            # Wysyłanie wiadomości e-mailowej do właściciela apartamentu
-            owner_subject = 'Nowa rezerwacja dla Twojego apartamentu'
-            owner_message = f'Właśnie dokonano nowej rezerwacji dla Twojego apartamentu {apartment.name}.'
-            owner_recipient_email = apartment.user.email
-            send_mail(owner_subject, owner_message, None, [owner_recipient_email])
+            # # Wysyłanie wiadomości e-mailowej do właściciela apartamentu
+            # owner_subject = 'Nowa rezerwacja dla Twojego apartamentu'
+            # owner_message = f'Właśnie dokonano nowej rezerwacji dla Twojego apartamentu {apartment.name}.'
+            # owner_recipient_email = apartment.user.email
+            # send_mail(owner_subject, owner_message, None, [owner_recipient_email])
 
             return redirect('reservations:booking_list')
         else:
@@ -422,84 +429,18 @@ from django.contrib.auth.decorators import login_required
 from .models import Booking, Message
 
 @login_required
-def send_message(request, booking_id):
-    booking = get_object_or_404(Booking, pk=booking_id)
-    
+def message_view(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    apartment = booking.name
     if request.method == 'POST':
         content = request.POST.get('content')
         sender = request.user
-        receiver = booking.name.user  # Właściciel mieszkania
-        apartment_id = booking.name.id  # Pobranie identyfikatora mieszkania
-        new_message = Message.objects.create(sender=sender, receiver=receiver, booking=booking, apartment_id=apartment_id, content=content)
-        return redirect('reservations:inbox')  # Przekierowanie do skrzynki odbiorczej
-    
-    return render(request, 'reservations/send_message.html', {'booking': booking})
-
-# @login_required
-# def inbox(request):
-#     received_messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
-#     return render(request, 'reservations/inbox.html', {'received_messages': received_messages})
-
-# @login_required
-# def inbox(request):
-#     received_messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
-#     # Pobranie wszystkich rezerwacji, które są powiązane z otrzymanymi wiadomościami
-#     related_bookings = Booking.objects.filter(message__in=received_messages).distinct()
-
-#     return render(request, 'reservations/inbox.html', {'received_messages': received_messages, 'related_bookings': related_bookings})
+        receiver = apartment.user
+        Message.objects.create(sender=sender, receiver=receiver, booking=booking, content=content)
+        # Optional: Add logic to handle message creation and redirection after sending
+    messages = Message.objects.filter(booking=booking)
+    return render(request, 'reservations/message.html', {'booking': booking, 'apartment': apartment, 'messages': messages})
 
 
-# @login_required
-# def reply(request):
-#     if request.method == 'POST':
-#         content = request.POST.get('content')
-#         booking_id = request.POST.get('booking_id')
-        
-#         if content and booking_id:
-#             booking = get_object_or_404(Booking, pk=booking_id)
-#             sender = request.user
-#             receiver = booking.user  # Użytkownik, który dokonał rezerwacji
-#             apartment_id = booking.name.id  # Pobranie identyfikatora mieszkania
-#             new_message = Message.objects.create(sender=sender, receiver=receiver, booking=booking, apartment_id=apartment_id, content=content)
-#             messages.success(request, 'Your reply has been sent.')
-#             return redirect('reservations:inbox')
-#         else:
-#             messages.error(request, 'Failed to send reply. Please provide both content and booking ID.')
-#             return redirect('reservations:inbox')
-#     else:
-#         messages.error(request, 'Invalid request method.')
-#         return redirect('reservations:inbox')
 
-@login_required
-@login_required
-def inbox(request):
-    if request.method == 'POST':
-        content = request.POST.get('content')
-        booking_id = request.POST.get('booking_id')
-        
-        print("Content:", content)  # Dodaj punkt kontrolny
-        print("Booking ID:", booking_id)  # Dodaj punkt kontrolny
-        
-        if content and booking_id:
-            booking = get_object_or_404(Booking, pk=booking_id)
-            print("Booking:", booking)  # Dodaj punkt kontrolny
-            
-            sender = request.user
-            receiver = booking.user
-            apartment_id = booking.name.id
-            print("Sender:", sender)  # Dodaj punkt kontrolny
-            print("Receiver:", receiver)  # Dodaj punkt kontrolny
-            print("Apartment ID:", apartment_id)  # Dodaj punkt kontrolny
-            
-            new_message = Message.objects.create(sender=sender, receiver=receiver, booking=booking, apartment_id=apartment_id, content=content)
-            messages.success(request, 'Your reply has been sent.')
-            return redirect('reservations:inbox')
-        else:
-            messages.error(request, 'Failed to send reply. Please provide both content and booking ID.')
-            return redirect('reservations:inbox')
-    else:
-        received_messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
-        related_bookings = Booking.objects.filter(message__in=received_messages).distinct()
-        print("Received Messages:", received_messages)  # Dodaj punkt kontrolny
-        print("Related Bookings:", related_bookings)  # Dodaj punkt kontrolny
-        return render(request, 'reservations/inbox.html', {'received_messages': received_messages, 'related_bookings': related_bookings})
+

@@ -1,22 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 
-
-
-
 {% if bookings %}
     <ul>
         {% for booking in bookings %}
             <li>{{ booking }}</li>
-            <a href="{% url 'reservations:DeleteBookingView' pk=booking.pk %}" class="btn btn-success">Delete</a>
+            
             <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-success">Chat</a>
         {% endfor %}
     </ul>
 {% else %}
     <p>No bookings available.</p>
 {% endif %}
-
-
-
 
 {% endblock %}

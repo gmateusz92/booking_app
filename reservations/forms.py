@@ -64,3 +64,4 @@ class BookingForm(forms.ModelForm):
                 raise ValidationError({'check_in': 'Thiss apartment is already booked for the selected dates.'})
 
         return cleaned_data
+    

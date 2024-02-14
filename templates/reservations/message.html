@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Message</title>
+</head>
+<body>
+    <h2>Message between {{ request.user.username }} and {{ apartment.user.username }}</h2>
+    <p>Booking: {{ booking }}</p>
+    <div>
+        {% for message in messages %}
+            <p>{{ message.sender.username }}: {{ message.content }}</p>
+            <small>Sent at: {{ message.timestamp }}</small>
+        {% endfor %}
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="content" placeholder="Type your message here..." required></textarea><br>
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>
+
+
+
+
+
+{% endblock %}
