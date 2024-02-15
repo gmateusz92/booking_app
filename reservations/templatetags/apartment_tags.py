@@ -1,5 +1,5 @@
 from django import template
-from reservations.models import Apartment
+from reservations.models import Apartment, Booking
 
 register = template.Library()
 
@@ -10,3 +10,6 @@ def if_user_offer_apartment(user):
     return False
 
 
+@register.filter
+def if_user_has_bookings(user):
+    return Booking.objects.filter(user=user).exists()

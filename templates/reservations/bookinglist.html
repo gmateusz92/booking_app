@@ -1,15 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 
-
-
+<h2 class="text-center mb-3" style="font-size: 40px;">My reservations</h2>
 
 {% if bookings %}
     <ul>
         {% for booking in bookings %}
             <li>{{ booking }}</li>
             <a href="{% url 'reservations:DeleteBookingView' pk=booking.pk %}" class="btn btn-success">Delete</a>
-            <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-success">Chat</a>
+            <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-success">Contact</a>
         {% endfor %}
     </ul>
 {% else %}

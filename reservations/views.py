@@ -139,7 +139,6 @@ class AddApartmentView(View):
 
 class EditApartmentView(View):
     template_name = 'reservations/edit_apartment.html'
-
     
     def get(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
@@ -164,8 +163,6 @@ class EditApartmentView(View):
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form })
-
-
 
 class DeleteApartmentView(View):
     template_name = 'reservations/delete_apartment.html'
@@ -192,14 +189,7 @@ def booking_list(request):
     }
     return render(request, 'reservations/bookinglist.html', context)
 
-@login_required
-def message_list(request):
-    user=request.user
-    bookings = Booking.objects.filter(user=user)
-    context = {
-        'bookings': bookings
-    }
-    return render(request, 'reservations/all_messages.html', context)
+
 
 def get_date(req_day):
         if req_day:
@@ -441,6 +431,15 @@ def message_view(request, booking_id):
     messages = Message.objects.filter(booking=booking)
     return render(request, 'reservations/message.html', {'booking': booking, 'apartment': apartment, 'messages': messages})
 
-
+@login_required
+def message_list(request):
+    user=request.user
+    bookings = Booking.objects.filter(user=user)
+    messages = Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
+    context = {
+        'bookings': bookings,
+        'messages': messages,
+    }
+    return render(request, 'reservations/all_messages.html', context)
 
 

@@ -21,15 +21,13 @@ class Apartment(models.Model):
     geolocation = map_fields.GeoLocationField(max_length=100, null=True)
     
     def __str__(self):
-        return f'{self.name} with {self.beds} beds for {self.capacity} people'
-     #tworzy point w admin panel
+        return f'{self.name}'
     
     def save(self, *args, **kwargs):
         if self.latitude and self.longitude:
             self.location = Point(float(self.longitude), float(self.latitude))
             return super(Apartment, self).save(*args, **kwargs)
         return super(Apartment, self).save(*args, **kwargs)
-
 
 
 class Photo(models.Model):
@@ -49,15 +47,8 @@ class Booking(models.Model):
     def __str__(self):
         formatted_check_in = self.check_in.strftime('%d-%m-%Y')
         formatted_check_out = self.check_out.strftime('%d-%m-%Y')
-        return f'{self.user} has booked {self.name} from {formatted_check_in} to {formatted_check_out}'
+        return f'{self.name} booked from {formatted_check_in} to {formatted_check_out}'
 
-#     def get_room_category(self): #funkcja pokazuje cala nazwe katerogii pokoju
-#         room_categories = dict(self.room.ROOM_CATEGORIES)
-#         room_category = room_categories.get(self.room.category)
-#         return room_category
-
-#     def get_cancel_booking_url(self):
-#         pass
 
 # class Message(models.Model):
 #     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
@@ -78,8 +69,8 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"Message from {self.sender} to {self.receiver} regarding booking ID {self.booking.pk}"
-
+        #return f"Message from {self.sender} to {self.receiver} regarding booking ID {self.booking.name}"
+        return f"Message from {self.sender} to {self.receiver} regarding booking of {self.booking.name} from {self.booking.check_in.strftime('%d-%m-%Y')} to {self.booking.check_out.strftime('%d-%m-%Y')}"
     
 
 

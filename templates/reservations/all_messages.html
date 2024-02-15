@@ -1,16 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<h2 class="text-center mb-3" style="font-size: 40px;">Messages box</h2>
+
 {% if bookings %}
     <ul>
         {% for booking in bookings %}
             <li>{{ booking }}</li>
-            
             <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-success">Chat</a>
         {% endfor %}
     </ul>
 {% else %}
-    <p>No bookings available.</p>
+    {% for message in messages %}
+        <li>{{ message }}</li>
+        <a href="{% url 'reservations:message_view' booking_id=message.booking.pk %}" class="btn btn-success">Chat</a>
+    {% endfor %}
+    {% if not messages %}
+        <p>No bookings available.</p>
+    {% endif %}
 {% endif %}
 
 {% endblock %}

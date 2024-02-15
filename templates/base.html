@@ -32,45 +32,52 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                {% if user|if_user_offer_apartment %}
-                <li class="nav-item">
-                    
-                    <a class="nav-link" href="{% url 'reservations:apartment_list'  %}">My Offers</a>
-                </li>
-                {% endif %}
                 {% if user.is_authenticated %}
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'reservations:booking_list' %}">Booking list</a>
-                </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="">My Profile</a>
+                        </li>
+                    {% if user|if_user_offer_apartment %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reservations:apartment_list' %}">My Offers</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% if user|if_user_has_bookings %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reservations:booking_list' %}">Booking list</a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reservations:calendar' %}">Calendar</a>
+                    </li>
                 {% endif %}
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'reservations:calendar' %}">Calendar</a>
-                </li>
             </ul>
-            <ul class="navbar-nav ml-auto"> <!-- Dodane "ml-auto" przesuwa elementy na prawo -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'reservations:message_list' %}">
-                        Mailbox
-                        <i class="fas fa-envelope text-grey"></i> <!-- Ikona koperty z ciemnym kolorem tekstu -->
-                    </a>
-                </li>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'accounts:registerUser' %}">Register</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>
-                </li>
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reservations:message_list' %}">
+                            Mailbox
+                            <i class="fas fa-envelope text-grey"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:registerUser' %}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
+
+
 
 <div class="container mt-4">
     {% block content %}{% endblock %}
