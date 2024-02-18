@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Apartment, Booking, Photo, Message, Booking_notification
+from .models import Apartment, Booking, Photo, Message
 from django.shortcuts import render, get_object_or_404
 from .forms import ApartmentForm, PhotoForm, BookingForm
 from django.views import View

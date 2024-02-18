@@ -73,9 +73,8 @@ class Message(models.Model):
         return f"Message from {self.sender} to {self.receiver} regarding booking of {self.booking.name} from {self.booking.check_in.strftime('%d-%m-%Y')} to {self.booking.check_out.strftime('%d-%m-%Y')}"
     
 
-
-class Booking_notification(models.Model):
-    apartment_owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+class Comment(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)  
+    apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, null=True) 
     content = models.TextField()
-    read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True) 
