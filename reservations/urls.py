@@ -28,6 +28,8 @@ urlpatterns = [
     path('message/<int:booking_id>/', message_view, name='message_view'),
     path('messages/', message_list, name='message_list')
    
+
+    # path('new_reservation_email/', new_reservation_email, name='new_reservation_email'),
     
     
     

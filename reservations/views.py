@@ -19,6 +19,8 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from .utils import get_date
+from accounts.utils import send_verification_email
 
 
 
@@ -33,13 +35,14 @@ def map(request):
 
 
 def home(request):
-    # Sprawdź, czy użytkownik wysłał formularz wyszukiwania
     query = request.GET.get('q', '')
-    # Sprawdź, czy użytkownik użył autouzupełnienia z Google Maps
     auto_complete_query = request.GET.get('id_address', '')
-    # Użyj wartości z autouzupełnienia, jeśli jest dostępna
     query = auto_complete_query if auto_complete_query else query
-    # Jeśli formularz został wysłany, szukaj w polu name, city, country
+    
+    sort_by_price = request.GET.get('sort_by_price')
+    apartments = Apartment.objects.all()
+
+
     if query:
         keywords = query.split(', ')
         if len(keywords) >= 1:
@@ -49,9 +52,13 @@ def home(request):
             )
             if len(keywords) >= 2:
                 apartments = apartments.filter(Q(country__icontains=keywords[1]) & Q(city__icontains=keywords[0]))
-    else:
-        # W przeciwnym razie, zwróć wszystkie apartamenty
-        apartments = Apartment.objects.all()
+    # else:
+    #     apartments = Apartment.objects.all()
+                
+    if sort_by_price == 'asc':
+        apartments = apartments.order_by('price')
+    elif sort_by_price == 'desc':
+        apartments = apartments.order_by('-price')            
 
     context = {
         'apartments': apartments,
@@ -67,7 +74,6 @@ class ApartmentDetailView(View):
         photo = Photo.objects.all()
         apartments = Apartment.objects.all()
 
-        # Dodaj kod dla kalendarza
         d = get_date(request.GET.get('day', None))
         year, month = d.year, d.month
         prev_month = date(year, month, 1) - timedelta(days=1)
@@ -77,10 +83,6 @@ class ApartmentDetailView(View):
 
         cal = Calendar(year, month, apartment)
         html_cal = cal.formatmonth(withyear=True)
-
-
-        # cal = Calendar(year, month)
-        # html_cal = cal.formatmonth(withyear=True)
 
         context = {
             'apartment': apartment,
@@ -191,11 +193,11 @@ def booking_list(request):
 
 
 
-def get_date(req_day):
-        if req_day:
-            year, month = (int(x) for x in req_day.split('-'))
-            return date(year, month, day=1)
-        return datetime.today()  
+# def get_date(req_day):
+#         if req_day:
+#             year, month = (int(x) for x in req_day.split('-'))
+#             return date(year, month, day=1)
+#         return datetime.today()  
 
 
 class CalendarView(ListView):
@@ -232,78 +234,7 @@ class CalendarView(ListView):
         context['next_month_url'] = next_month_url
 
         return context
-    
-   
-# class CalendarView(View):
-#     template_name = 'reservations/calendar.html'
-
-#     def get(self, request, pk, year, month):
-#         apartment = get_object_or_404(Apartment, pk=pk)
-#         photo = Photo.objects.all()
-#         apartments = Apartment.objects.all()
-
-#         # Oblicz poprzedni i kolejny miesiąc
-#         prev_month = date(year, month, 1) - timedelta(days=1)
-#         next_month = date(year, month, 28) + timedelta(days=7)
-
-#         # Twórz linki do poprzedniego i kolejnego miesiąca z uwzględnieniem apartamentu
-#         prev_month_url = reverse('reservations:calendar', args=[pk, prev_month.year, prev_month.month])
-#         next_month_url = reverse('reservations:calendar', args=[pk, next_month.year, next_month.month])
-
-#         # Twórz kalendarz
-#         cal = Calendar(year, month, apartment)
-#         html_cal = cal.formatmonth(withyear=True)
-
-#         context = {
-#             'apartment': apartment,
-#             'photo': photo,
-#             'apartments': apartments,
-#             'calendar': mark_safe(html_cal),
-#             'prev_month_url': prev_month_url,
-#             'next_month_url': next_month_url,
-#         }
-
-#         return render(request, 'reservations/calendar.html', context)
-    
-
-# class ReserveView(View):
-#     template_name = 'reservations/reserve_apartment.html'
-
-#     def get(self, request, pk):
-#         apartment = get_object_or_404(Apartment, pk=pk)
-
-#         d = get_date(request.GET.get('day', None))
-#         year, month = d.year, d.month
-#         prev_month = date(year, month, 1) - timedelta(days=1)
-#         prev_month_url = reverse('reservations:ReserveView', kwargs={'pk': pk}) + f'?day={prev_month.year}-{prev_month.month}'
-#         next_month = date(year, month, 28) + timedelta(days=7)
-#         next_month_url = reverse('reservations:ReserveView', kwargs={'pk': pk}) + f'?day={next_month.year}-{next_month.month}'
-
-#         cal = Calendar(year, month, apartment)
-#         html_cal = cal.formatmonth(withyear=True)
-
-#         context = {
-#             'apartment': apartment,
-#             'calendar': mark_safe(html_cal),
-#             'prev_month_url': prev_month_url,
-#             'next_month_url': next_month_url,
-#         }
-
-#         return render(request, self.template_name, context)
-    
-#     def post(self, request):
-#         form = ReservationForm(request.POST)
-        
-
-#         if form.is_valid():
-#             booking = form.save(commit=False)
-#             booking.user=request.user
-#             booking.save()
-            
-#             return redirect('reservations:booking_list', pk=booking.pk)
-        
-#         return render(request, self.template_name, {'form': form, 'booking': booking })
-    
+     
 
 
 class BookingView(View):
@@ -354,6 +285,11 @@ class BookingView(View):
             # owner_message = f'Właśnie dokonano nowej rezerwacji dla Twojego apartamentu {apartment.name}.'
             # owner_recipient_email = apartment.user.email
             # send_mail(owner_subject, owner_message, None, [owner_recipient_email])
+            # send verification email
+            user = apartment.user
+            mail_subject = 'You have new reservation!'
+            email_template = 'emails/reservation_done.html'
+            send_verification_email(request, user, mail_subject, email_template)
 
             return redirect('reservations:booking_list')
         else:

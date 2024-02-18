@@ -1,22 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
     
-        
-<!-- <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
-    <div>
-        <h2 class="text-center mb-3 " style="font-size: 40px;">Search location</h2>
-        <form class="form-inline" method="get" action="{% url 'reservations:home' %}">
-            {% csrf_token %}
-            <input id="searchLocation" class="form-control mr-sm-2" style="width: 350px;" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-        </form>
-        <br>
-        <div class="text-center mb-3">
-            <h2 style="font-size: 40px;">... or add your offer.</h2>
-            <a href="{% url 'reservations:AddApartmentView' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; font-size: 16px; background-color: #2e2f2e; color: white; text-decoration: none; border: none; border-radius: 5px; cursor: pointer;">Click to add</a>
-        </div>
-    </div>
-</div> -->
 
 <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
     <div>
@@ -28,12 +12,15 @@
         </form>
         <br>
         <div class="text-center mb-3">
-            <h2 style="font-size: 40px;">... or add your offer.</h2>
-            <a href="{% url 'reservations:AddApartmentView' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; font-size: 16px; background-color: #2e2f2e; color: white; text-decoration: none; border: none; border-radius: 5px; cursor: pointer;">Click to add</a>
+            {% if request.user.is_authenticated %}
+                <h2 style="font-size: 40px;">... or add your offer.</h2>
+                <a href="{% url 'reservations:AddApartmentView' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; font-size: 16px; background-color: #2e2f2e; color: white; text-decoration: none; border: none; border-radius: 5px; cursor: pointer;">Click to add</a>
+            {% else %}
+                <h2 style="font-size: 40px;">Login to add offer</h2>
+            {% endif %}
         </div>
     </div>
 </div>
-
 
 <div class="text-center mb-3">
     <h2 style="font-size: 20px;">Sort by Price:</h2>
@@ -82,7 +69,7 @@
     <footer class="text-body-secondary py-5">
       <div class="container">
         <p class="float-end mb-1">
-          <a href="#">Back to top</a>
+          <a href="#" class="btn btn-secondary my-2 my-sm-0" type="submit">Back to top</a>
         </p>
       </div>
     </footer>

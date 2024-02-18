@@ -16,7 +16,7 @@
         <a href="{% url 'reservations:message_view' booking_id=message.booking.pk %}" class="btn btn-success">Chat</a>
     {% endfor %}
     {% if not messages %}
-        <p>No bookings available.</p>
+        <p>You didn't received any message.</p>
     {% endif %}
 {% endif %}
 

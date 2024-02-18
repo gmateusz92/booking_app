@@ -1,7 +1,6 @@
 from django.urls import path
-from. views import registerUser, index, login, logout,  custDashboard, vendorDashboard
+from. views import registerUser, index, login, logout, myprofile, activate, forgot_password, reset_password_validate, reset_password
 
-from . import views
 app_name = 'accounts'
 
 urlpatterns = [
@@ -12,7 +11,14 @@ urlpatterns = [
 
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
+    path('myprofile/', myprofile, name='myprofile'),
+
+    path('activate/<uidb64>/<token>', activate, name='activate'), #wysylanie linku potwierdzajacego
+    path('forgot_password/', forgot_password, name='forgot_password'),
+    path('reset_password_validate/<uidb64>/<token>/', reset_password_validate, name='reset_password_validate'),
+    path('reset_password/', reset_password, name='reset_password'),
+
     # path('myAccount/', myAccount, name='myAccount'), #customer albo vender
-    path('custDashboard/', custDashboard, name='custDashboard'),
-    path('vendorDashboard/', vendorDashboard, name='vendorDashboard'),
+    #ath('custDashboard/', custDashboard, name='custDashboard'),
+    
 ]

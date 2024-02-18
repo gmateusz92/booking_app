@@ -1,6 +1,6 @@
 from calendar import HTMLCalendar
 from .models import Booking
-# from datetime import datetime, date
+from datetime import datetime, date
 
 class Calendar(HTMLCalendar):
     def __init__(self, year=None, month=None, apartment=None):
@@ -38,8 +38,8 @@ class Calendar(HTMLCalendar):
         return cal
 
 
-# def get_date(req_day):
-#         if req_day:
-#             year, month = (int(x) for x in req_day.split('-'))
-#             return date(year, month, day=1)
-#         return datetime.today() 
+def get_date(req_day):
+        if req_day:
+            year, month = (int(x) for x in req_day.split('-'))
+            return date(year, month, day=1)
+        return datetime.today() 

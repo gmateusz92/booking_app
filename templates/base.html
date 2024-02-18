@@ -34,7 +34,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="">My Profile</a>
+                            <a class="nav-link" href="{% url 'accounts:myprofile' %}">My Profile</a>
                         </li>
                     {% if user|if_user_offer_apartment %}
                         <li class="nav-item">
