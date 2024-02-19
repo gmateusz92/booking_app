@@ -50,17 +50,6 @@ class Booking(models.Model):
         return f'{self.name} booked from {formatted_check_in} to {formatted_check_out}'
 
 
-# class Message(models.Model):
-#     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
-#     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages')
-#     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
-#     content = models.TextField()
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE)  # Dodaj to pole
-
-#     def __str__(self):
-#         return f"Message from {self.sender} to {self.receiver} regarding booking ID {self.booking.pk}"
-
 class Message(models.Model):
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages')

@@ -8,7 +8,6 @@ from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
 from django.db.models import Q
 from django.conf import settings
-import googlemaps
 from datetime import datetime, date, timedelta
 from django.utils.safestring import mark_safe
 from .models import *
@@ -21,6 +20,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from .utils import get_date
 from accounts.utils import send_verification_email
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+
 
 
 
@@ -38,10 +40,8 @@ def home(request):
     query = request.GET.get('q', '')
     auto_complete_query = request.GET.get('id_address', '')
     query = auto_complete_query if auto_complete_query else query
-    
     sort_by_price = request.GET.get('sort_by_price')
     apartments = Apartment.objects.all()
-
 
     if query:
         keywords = query.split(', ')
@@ -51,10 +51,7 @@ def home(request):
                 Q(country__icontains=keywords[0]) | Q(city__icontains=keywords[0])
             )
             if len(keywords) >= 2:
-                apartments = apartments.filter(Q(country__icontains=keywords[1]) & Q(city__icontains=keywords[0]))
-    # else:
-    #     apartments = Apartment.objects.all()
-                
+                apartments = apartments.filter(Q(country__icontains=keywords[1]) & Q(city__icontains=keywords[0]))          
     if sort_by_price == 'asc':
         apartments = apartments.order_by('price')
     elif sort_by_price == 'desc':
@@ -114,7 +111,6 @@ def apartment_list(request):
     return render(request, 'reservations/my_apartments.html', {'apartments': apartments})
 
 
-
 class AddApartmentView(View):
     template_name = 'reservations/add_apartment.html'
 
@@ -166,6 +162,7 @@ class EditApartmentView(View):
 
         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form })
 
+
 class DeleteApartmentView(View):
     template_name = 'reservations/delete_apartment.html'
 
@@ -203,39 +200,26 @@ def booking_list(request):
 class CalendarView(ListView):
     model = Booking
     template_name = 'reservations/calendar.html'
-    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Pobieramy obiekt daty na podstawie parametru 'day' z żądania
         d = get_date(self.request.GET.get('day', None))
-
-        # Ustalamy aktualny rok i miesiąc
         year, month = d.year, d.month
-
-        # Przechodzimy do poprzedniego miesiąca
         prev_month = date(year, month, 1) - timedelta(days=1)
         prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
-
-        # Przechodzimy do następnego miesiąca
         next_month = date(year, month, 28) + timedelta(days=7)
         next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
-
-        # Instantiate our calendar class with today's year and date
+        
         cal = Calendar(year, month)
 
-        # Call the formatmonth method, which returns our calendar as a table
         html_cal = cal.formatmonth(withyear=True)
         context['calendar'] = mark_safe(html_cal)
 
-        # Dodajemy dane nawigacyjne do kontekstu
         context['prev_month_url'] = prev_month_url
         context['next_month_url'] = next_month_url
 
         return context
      
-
 
 class BookingView(View):
     template_name = 'reservations/reserve_apartment.html'
@@ -332,27 +316,7 @@ class DeleteBookingView(View):
         else:
             # Jeśli użytkownik nie ma rezerwacji, przekierowujemy na stronę główną
             return redirect('reservations:home')
-        
-
-# def czat(request, pk):
-#     apartment = get_object_or_404(Apartment, id=pk)
-#     owner = apartment.user
-#     booking = get_object_or_404(Booking, user=request.user, name=apartment)
-
-#     if request.method == 'POST':
-#         text = request.POST.get('text')
-#         message = Message.objects.create(sender=request.user, receiver=owner, text=text)
-#         return JsonResponse({'status': 'ok'})
-
-#     messages = Message.objects.filter(
-#         (models.Q(nadawca=request.user, odbiorca=owner)) | (models.Q(nadawca=owner, odbiorca=request.user))
-#     ).order_by('data')
-
-#     return render(request, 'czat.html', {'wlasciciel_apartamentu': owner, 'wiadomosci': messages, 'booking': booking})        
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Booking, Message
+              
 
 @login_required
 def message_view(request, booking_id):
@@ -378,4 +342,17 @@ def message_list(request):
     }
     return render(request, 'reservations/all_messages.html', context)
 
+def view_opinions(request, apartment_id):
+    apartment = get_object_or_404(Apartment, pk=apartment_id)
+    comments = Comment.objects.filter(apartment=apartment)
+    context = {
+        'apartment': apartment,
+        'comments': comments,
+    }
+    return render(request, 'reservations/view_opinion.html', context)
 
+
+def booking_history(request):
+    user_bookings = Booking.objects.filter(user=request.user, check_out__lt=datetime.now())
+    context = {'user_bookings': user_bookings}
+    return render(request, 'booking_history.html', context)
