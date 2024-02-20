@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Apartment, Booking, Photo, Message
 from django.shortcuts import render, get_object_or_404
-from .forms import ApartmentForm, PhotoForm, BookingForm
+from .forms import ApartmentForm, PhotoForm, BookingForm, CommentForm
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
@@ -342,17 +342,58 @@ def message_list(request):
     }
     return render(request, 'reservations/all_messages.html', context)
 
-def view_opinions(request, apartment_id):
-    apartment = get_object_or_404(Apartment, pk=apartment_id)
-    comments = Comment.objects.filter(apartment=apartment)
-    context = {
-        'apartment': apartment,
-        'comments': comments,
-    }
-    return render(request, 'reservations/view_opinion.html', context)
+def read_opinions(request, apartment_id):
+    bookings = Booking.objects.filter(name_id=apartment_id).exclude(comment=None)
+    return render(request, 'reservations/view_opinion.html', {'bookings': bookings})
 
 
+# def booking_history(request):
+#     form = CommentForm()
+#     user_bookings = Booking.objects.filter(user=request.user, check_out__lt=datetime.now())
+#     context = {
+#         'user_bookings': user_bookings,
+#         'form': form,
+#     }
+#     return render(request, 'reservations/booking_history.html', context)
+
+
+# class BookingHistoryView(View):
+#     template_name = 'reservations/booking_history.html'
+
+#     def get(self, request, apartment_id):
+#         apartment = get_object_or_404(Apartment, pk=apartment_id)
+#         user_bookings = Booking.objects.filter(user=request.user, check_out__lt=datetime.now())
+#         form = CommentForm()
+#         context = {
+#             'user_bookings': user_bookings,
+#             'form': form,
+#             'apartment': apartment,
+#         }
+#         return render(request, self.template_name, context)
+    
+#     def post(self, request, apartment_id, booking_id):
+#         form = CommentForm(request.POST)
+
+#         if form.is_valid():
+#             comment = form.save(commit=False)
+#             comment.user = request.user
+#             comment.apartment = get_object_or_404(Apartment, pk=apartment_id)
+#             comment.booking = get_object_or_404(Booking, pk=booking_id)
+#             comment.save()
+#             return redirect('reservations:BookingHistoryView', apartment_id=apartment_id)
+
+#         return render(request, self.template_name, {'form': form })
+    
 def booking_history(request):
-    user_bookings = Booking.objects.filter(user=request.user, check_out__lt=datetime.now())
-    context = {'user_bookings': user_bookings}
-    return render(request, 'booking_history.html', context)
+    bookings = Booking.objects.filter(user=request.user)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            booking_id = form.cleaned_data['booking_id']
+            comment_content = form.cleaned_data['comment']
+            booking = Booking.objects.get(id=booking_id)
+            booking.comment = comment_content
+            booking.save()
+    else:
+        form = CommentForm()
+    return render(request, 'reservations/booking_history.html', {'bookings': bookings, 'form': form})    

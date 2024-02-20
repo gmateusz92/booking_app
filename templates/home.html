@@ -54,7 +54,7 @@
                                 <div class="btn-group">
                                     <a href="{% url 'reservations:ApartmentDetailView' pk=apartment.pk %}" class="btn btn-sm btn-outline-secondary">View more</a>
                                     <span style="margin: 0 5px;"></span> <!-- Dodaj odstęp między przyciskami -->
-                                    <a href="{% url 'reservations:view_opinions' apartment_id=apartment.pk %}" class="btn btn-sm btn-outline-secondary">Read opinions</a>
+                                    <a href="{% url 'reservations:read_opinions' apartment.id %}" class="btn btn-sm btn-outline-secondary">Read opinions</a>
                                 </div>
                                 <small class="text-body-secondary">{{ apartment.price }} $</small>
                             </div>

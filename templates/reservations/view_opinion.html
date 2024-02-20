@@ -1,12 +1,22 @@
 {% extends 'base.html' %}
-
 {% block content %}
+    
 
-{% for comment in comments %}
 
-{{ comment.content }}
+<h1>Opinions</h1>
 
-{% endfor %}
+<ul>
+  {% for booking in bookings %}
+  <li>
+    <strong>Imię użytkownika:</strong> {{ booking.user.first_name }} {{ booking.user.last_name }}<br>
+    <strong>Data rezerwacji:</strong> {{ booking.check_in|date:"d-m-Y" }} - {{ booking.check_out|date:"d-m-Y" }}<br>
+    
+    <strong>Opinia:</strong> {{ booking.comment }}
+  </li>
+  {% empty %}
+  <li>No opinions available</li>
+  {% endfor %}
+</ul>
 
 
 {% endblock %}

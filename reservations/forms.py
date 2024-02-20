@@ -1,5 +1,5 @@
 from django import forms
-from .models import Apartment, Photo, Booking
+from .models import Apartment, Photo, Booking #, Comment
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 
@@ -65,3 +65,12 @@ class BookingForm(forms.ModelForm):
 
         return cleaned_data
     
+# class CommentForm(forms.ModelForm):
+#     class Meta:
+#         model = Comment
+#         fields = ['content']
+
+
+class CommentForm(forms.Form):
+    booking_id = forms.IntegerField(widget=forms.HiddenInput())
+    comment = forms.CharField(widget=forms.Textarea)

@@ -1,5 +1,5 @@
 from django.urls import path
-from. views import home, booking_list, ApartmentDetailView,  AddApartmentView, EditApartmentView, DeleteApartmentView, apartment_list , map, CalendarView, BookingView , DeleteBookingView , message_view, message_list, view_opinions, booking_history # inbox ,# apartment_detail, # #search  my_apartment_detail # MyApartmentView, my_apartment_detail #MyApartmentDetailView
+from. views import home, booking_list, ApartmentDetailView,  AddApartmentView, EditApartmentView, DeleteApartmentView, apartment_list , map, CalendarView, BookingView , DeleteBookingView , message_view, message_list,  booking_history , read_opinions#BookingHistoryView # inbox ,# apartment_detail, # #search  my_apartment_detail # MyApartmentView, my_apartment_detail #MyApartmentDetailView
 
 from . import views
 app_name = 'reservations'
@@ -28,8 +28,12 @@ urlpatterns = [
     path('message/<int:booking_id>/', message_view, name='message_view'),
     path('messages/', message_list, name='message_list'),
    
-    path('apartment/<int:apartment_id>/opinions/', view_opinions, name='view_opinions'),
+     path('apartment/<int:apartment_id>/opinions/', read_opinions, name='read_opinions'),
+    # path('apartment/<int:apartment_id>/opinions/', view_opinions, name='view_opinions'),
     path('booking_history/', booking_history, name='booking_history'),
+   # path('booking_history/<int:apartment_id>/<int:booking_id>/', BookingHistoryView.as_view(), name='booking_history'),
+    
+
 ]
 
     # path('new_reservation_email/', new_reservation_email, name='new_reservation_email'),

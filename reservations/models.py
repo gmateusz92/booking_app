@@ -43,6 +43,7 @@ class Booking(models.Model):
     name = models.ForeignKey(Apartment, on_delete=models.CASCADE, null=True)
     check_in = models.DateTimeField(null=True)
     check_out = models.DateTimeField(null=True)
+    comment = models.TextField(blank=True, null=True)
 
     def __str__(self):
         formatted_check_in = self.check_in.strftime('%d-%m-%Y')
@@ -62,8 +63,8 @@ class Message(models.Model):
         return f"Message from {self.sender} to {self.receiver} regarding booking of {self.booking.name} from {self.booking.check_in.strftime('%d-%m-%Y')} to {self.booking.check_out.strftime('%d-%m-%Y')}"
     
 
-class Comment(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)  
-    apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, null=True) 
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True) 
+# class Comment(models.Model):
+#     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)  
+#     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, null=True) 
+#     content = models.TextField()
+#     created_at = models.DateTimeField(auto_now_add=True) 
