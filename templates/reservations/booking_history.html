@@ -6,26 +6,21 @@
 <h1>Historia Rezerwacji</h1>
 
 <ul>
-  {% if booking %}
+  
   {% for booking in bookings %}
-  <li>
-    {{ booking.name }} zarezerwowane od {{ booking.check_in|date:"d-m-Y" }} do {{ booking.check_out|date:"d-m-Y" }}
-    {% if not booking.comment %}
-    <form method="post" action="{% url 'reservations:booking_history' %}">
-      {% csrf_token %}
-      <input type="hidden" name="booking_id" value="{{ booking.id }}">
-      {{ form.comment }}
-      <button type="submit">Dodaj Opinię</button>
-    </form>
-    {% else %}
-    <p>Opinia: {{ booking.comment }}</p>
-    {% endif %}
-  </li>
-  {% endfor %}
-</ul>
+  <p>{{ booking.apartment.name }} - {{ booking.check_in }} to {{ booking.check_out }}</p>
+  {% if not booking.comment %}
+      <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <input type="hidden" name="booking_id" value="{{ booking.id }}">
+          <button type="submit">Submit</button>
+      </form>
+  {% else %}
+      <p>Comment: {{ booking.comment }}</p>
+      <p>Rating: {{ booking.rating }}</p>
+  {% endif %}
+{% endfor %}
 
-{% else %}
 
-You dont have any reservations in your history.
-{% endif %}
 {% endblock %}

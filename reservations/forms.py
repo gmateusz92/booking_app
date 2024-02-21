@@ -70,7 +70,9 @@ class BookingForm(forms.ModelForm):
 #         model = Comment
 #         fields = ['content']
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class CommentForm(forms.Form):
     booking_id = forms.IntegerField(widget=forms.HiddenInput())
     comment = forms.CharField(widget=forms.Textarea)
+    rating = forms.IntegerField(label='Rating (1-5)', validators=[MinValueValidator(1), MaxValueValidator(5)])

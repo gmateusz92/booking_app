@@ -22,7 +22,7 @@ from .utils import get_date
 from accounts.utils import send_verification_email
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Avg
 
 
 
@@ -42,6 +42,10 @@ def home(request):
     query = auto_complete_query if auto_complete_query else query
     sort_by_price = request.GET.get('sort_by_price')
     apartments = Apartment.objects.all()
+
+    for apartment in apartments:
+        average_rating = Booking.objects.filter(name=apartment).aggregate(Avg('rating'))['rating__avg']
+        apartment.average_rating = round(average_rating, 2) if average_rating else None
 
     if query:
         keywords = query.split(', ')
@@ -391,9 +395,11 @@ def booking_history(request):
         if form.is_valid():
             booking_id = form.cleaned_data['booking_id']
             comment_content = form.cleaned_data['comment']
+            rating_value = form.cleaned_data['rating']
             booking = Booking.objects.get(id=booking_id)
             booking.comment = comment_content
+            booking.rating = rating_value
             booking.save()
     else:
         form = CommentForm()
-    return render(request, 'reservations/booking_history.html', {'bookings': bookings, 'form': form})    
+    return render(request, 'reservations/booking_history.html', {'bookings': bookings, 'form': form}) 

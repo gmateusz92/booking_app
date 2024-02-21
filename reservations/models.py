@@ -44,6 +44,7 @@ class Booking(models.Model):
     check_in = models.DateTimeField(null=True)
     check_out = models.DateTimeField(null=True)
     comment = models.TextField(blank=True, null=True)
+    rating = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         formatted_check_in = self.check_in.strftime('%d-%m-%Y')

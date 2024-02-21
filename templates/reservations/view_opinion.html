@@ -11,7 +11,8 @@
     <strong>Imię użytkownika:</strong> {{ booking.user.first_name }} {{ booking.user.last_name }}<br>
     <strong>Data rezerwacji:</strong> {{ booking.check_in|date:"d-m-Y" }} - {{ booking.check_out|date:"d-m-Y" }}<br>
     
-    <strong>Opinia:</strong> {{ booking.comment }}
+    <strong>Opinia:</strong> {{ booking.comment }}<br>
+    <strong>Ocena:</strong> {{ booking.rating }}
   </li>
   {% empty %}
   <li>No opinions available</li>
