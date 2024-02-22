@@ -2,7 +2,6 @@ from django.db import models
 from booking import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
-from django.contrib.gis.db import models as gismodels
 from django_google_maps import fields as map_fields
 
 class Apartment(models.Model):
@@ -64,8 +63,10 @@ class Message(models.Model):
         return f"Message from {self.sender} to {self.receiver} regarding booking of {self.booking.name} from {self.booking.check_in.strftime('%d-%m-%Y')} to {self.booking.check_out.strftime('%d-%m-%Y')}"
     
 
-# class Comment(models.Model):
-#     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)  
-#     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, null=True) 
-#     content = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True) 
+# class NotificationPreference(models.Model):
+#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     location = models.PointField(null=True, blank=True)  # Lokalizacja użytkownika
+#     radius = models.PositiveIntegerField(default=0)     # Promień powiadomień w kilometrach
+
+#     def __str__(self):
+#         return f"Powiadomienia dla {self.user.username}"

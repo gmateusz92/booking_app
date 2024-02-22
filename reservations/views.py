@@ -23,6 +23,7 @@ from accounts.utils import send_verification_email
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
+from datetime import date
 
 
 
@@ -97,17 +98,6 @@ class ApartmentDetailView(View):
     
         return render(request, 'reservations/apartment_detail.html', context)
     
-
-# class MyApartmentView(LoginRequiredMixin, View):
-#     template_name = 'reservations/my_apartments.html'
-
-#     def get(self, request, *args, **kwargs):
-#         my_apartments = Apartment.objects.filter(user=request.user)
-#         context = {
-#             'my_apartments': my_apartments
-#             }
-#         return render(request, self.template_name, context)
-#<!-- <a class="nav-link" href="{% url 'reservations:MyApartmentView' pk=user.id %}">My Offers</a> -->
 
 def apartment_list(request):
     user = request.user
@@ -186,7 +176,8 @@ class DeleteApartmentView(View):
 @login_required
 def booking_list(request):
     user=request.user
-    bookings = Booking.objects.filter(user=user)
+    current_date = date.today()
+    bookings = Booking.objects.filter(user=user, check_in__gte=current_date)
     context = {
         'bookings': bookings
     }
@@ -389,7 +380,8 @@ def read_opinions(request, apartment_id):
 #         return render(request, self.template_name, {'form': form })
     
 def booking_history(request):
-    bookings = Booking.objects.filter(user=request.user)
+    current_datetime = date.today()
+    bookings = Booking.objects.filter(user=request.user, check_out__lt=current_datetime)
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():

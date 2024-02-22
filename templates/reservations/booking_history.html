@@ -1,26 +1,32 @@
 {% extends 'base.html' %}
+
 {% block content %}
-    
-
-
-<h1>Historia Rezerwacji</h1>
-
-<ul>
-  
-  {% for booking in bookings %}
-  <p>{{ booking.apartment.name }} - {{ booking.check_in }} to {{ booking.check_out }}</p>
-  {% if not booking.comment %}
-      <form method="post">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <input type="hidden" name="booking_id" value="{{ booking.id }}">
-          <button type="submit">Submit</button>
-      </form>
-  {% else %}
-      <p>Comment: {{ booking.comment }}</p>
-      <p>Rating: {{ booking.rating }}</p>
-  {% endif %}
-{% endfor %}
-
-
+<div class="container">
+    <h1>Reservation History</h1>
+    <hr>
+    <ul class="list-group">
+        {% for booking in bookings %}
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col-md-8">
+                    <p>Reservation {{ booking.name.name }} from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}.</p>
+                </div>
+                <div class="col-md-4">
+                    {% if not booking.comment %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                        <button type="submit" class="btn btn-dark">Add Opinion and Rate</button>
+                    </form>
+                    {% else %}
+                    <p><strong>Opinion:</strong> {{ booking.comment }}</p>
+                    <p><strong>Rate:</strong> {{ booking.rating }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
