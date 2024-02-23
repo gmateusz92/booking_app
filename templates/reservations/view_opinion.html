@@ -1,23 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
     
-
-
-<h1>Opinions</h1>
-
-<ul>
-  {% for booking in bookings %}
-  <li>
-    <strong>Imię użytkownika:</strong> {{ booking.user.first_name }} {{ booking.user.last_name }}<br>
-    <strong>Data rezerwacji:</strong> {{ booking.check_in|date:"d-m-Y" }} - {{ booking.check_out|date:"d-m-Y" }}<br>
-    
-    <strong>Opinia:</strong> {{ booking.comment }}<br>
-    <strong>Ocena:</strong> {{ booking.rating }}
-  </li>
-  {% empty %}
-  <li>No opinions available</li>
-  {% endfor %}
-</ul>
+<div class="container">
+  <h1>Opinions</h1>
+  <hr>
+  <ul class="list-group">
+      {% for booking in bookings %}
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col">
+            <strong>Name:</strong> {{ booking.user.first_name }} <br>
+            <strong>Booking Date:</strong> {{ booking.check_in|date:"d-m-Y" }} - {{ booking.check_out|date:"d-m-Y" }}<br>
+            <strong>Opinion:</strong> {{ booking.comment }}<br>
+            <strong>Rating:</strong> {{ booking.rating }} 
+            
+            <i class="bi bi-star"></i>
+          </div>
+        </div>
+      </li>
+      {% empty %}
+      <li class="list-group-item">No opinions available</li>
+      {% endfor %} 
+  </ul>
+</div>
 
 
 {% endblock %}

@@ -3,25 +3,18 @@ from .models import Apartment, Booking, Photo, Message
 from django.shortcuts import render, get_object_or_404
 from .forms import ApartmentForm, PhotoForm, BookingForm, CommentForm
 from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import DetailView
-from django.views.generic.edit import UpdateView
 from django.db.models import Q
-from django.conf import settings
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 from django.utils.safestring import mark_safe
 from .models import *
 from .utils import Calendar
 from django.views.generic import ListView
 from django.urls import reverse
-from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
 from .utils import get_date
 from accounts.utils import send_verification_email
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
 from datetime import date
 
@@ -46,7 +39,10 @@ def home(request):
 
     for apartment in apartments:
         average_rating = Booking.objects.filter(name=apartment).aggregate(Avg('rating'))['rating__avg']
-        apartment.average_rating = round(average_rating, 2) if average_rating else None
+        if average_rating is not None:
+            apartment.average_rating = round(average_rating, 2)
+        else:
+            apartment.average_rating = "No Ratings"
 
     if query:
         keywords = query.split(', ')
@@ -98,7 +94,7 @@ class ApartmentDetailView(View):
     
         return render(request, 'reservations/apartment_detail.html', context)
     
-
+@login_required
 def apartment_list(request):
     user = request.user
     apartments = Apartment.objects.filter(user=user)
@@ -170,7 +166,6 @@ class DeleteApartmentView(View):
         if Apartment.objects.filter(user=request.user).exists():
             return redirect('reservations:apartment_list')
         else:
-            # Jeśli użytkownik nie ma ofert, przekierowujemy na stronę główną
             return redirect('reservations:home')
 
 @login_required
@@ -182,14 +177,7 @@ def booking_list(request):
         'bookings': bookings
     }
     return render(request, 'reservations/bookinglist.html', context)
-
-
-
-# def get_date(req_day):
-#         if req_day:
-#             year, month = (int(x) for x in req_day.split('-'))
-#             return date(year, month, day=1)
-#         return datetime.today()  
+ 
 
 
 class CalendarView(ListView):
@@ -342,43 +330,7 @@ def read_opinions(request, apartment_id):
     return render(request, 'reservations/view_opinion.html', {'bookings': bookings})
 
 
-# def booking_history(request):
-#     form = CommentForm()
-#     user_bookings = Booking.objects.filter(user=request.user, check_out__lt=datetime.now())
-#     context = {
-#         'user_bookings': user_bookings,
-#         'form': form,
-#     }
-#     return render(request, 'reservations/booking_history.html', context)
-
-
-# class BookingHistoryView(View):
-#     template_name = 'reservations/booking_history.html'
-
-#     def get(self, request, apartment_id):
-#         apartment = get_object_or_404(Apartment, pk=apartment_id)
-#         user_bookings = Booking.objects.filter(user=request.user, check_out__lt=datetime.now())
-#         form = CommentForm()
-#         context = {
-#             'user_bookings': user_bookings,
-#             'form': form,
-#             'apartment': apartment,
-#         }
-#         return render(request, self.template_name, context)
-    
-#     def post(self, request, apartment_id, booking_id):
-#         form = CommentForm(request.POST)
-
-#         if form.is_valid():
-#             comment = form.save(commit=False)
-#             comment.user = request.user
-#             comment.apartment = get_object_or_404(Apartment, pk=apartment_id)
-#             comment.booking = get_object_or_404(Booking, pk=booking_id)
-#             comment.save()
-#             return redirect('reservations:BookingHistoryView', apartment_id=apartment_id)
-
-#         return render(request, self.template_name, {'form': form })
-    
+@login_required    
 def booking_history(request):
     current_datetime = date.today()
     bookings = Booking.objects.filter(user=request.user, check_out__lt=current_datetime)

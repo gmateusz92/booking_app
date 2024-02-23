@@ -93,7 +93,7 @@ def login(request):
         if user is not None:
             auth.login(request, user)
             messages.success(request, 'You are now logged in.')
-            return redirect('accounts:index')
+            return redirect('reservations:home')
         else:
             messages.error(request, 'Invalid login credentials - activate your account')
             return redirect('accounts:login')
@@ -104,7 +104,7 @@ def login(request):
 def logout(request):
     auth.logout(request)
     messages.info(request, 'You are logged out.')
-    return redirect('accounts:index')
+    return redirect('accounts:login')
 
 
 

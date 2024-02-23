@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<br>
-<h1 class="display-5 fw-bold text-center">Reserve {{ apartment.name }}</h1>
 
+
+
+<h1 class="display-5 fw-bold text-center">Reserve {{ apartment.name|capfirst }}</h1>
 
 <div class="mt-5 d-flex flex-column align-items-center justify-content-center ">
     <form method="post" action="{% url 'reservations:BookingView' pk=apartment.pk %}" class="d-flex flex-column align-items-center justify-content-center">
@@ -27,11 +28,6 @@ Red means unavailable
 
     {{ calendar }}
 </div>
-
-
-
-
-
 
 
 

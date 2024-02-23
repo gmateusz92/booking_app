@@ -8,18 +8,18 @@
     <title>Message</title>
 </head>
 <body>
-    <h2>Message between {{ request.user.username }} and {{ apartment.user.username }}</h2>
-    <p>Booking: {{ booking }}</p>
+    <h2>Chat between {{ request.user.username|capfirst }} and {{ apartment.user.username|capfirst }}</h2>
+    <p>Booking: {{ booking|capfirst }}</p>
     <div>
         {% for message in messages %}
-            <p>{{ message.sender.username }}: {{ message.content }}</p>
+            <p>{{ message.sender.username|capfirst }}: {{ message.content|capfirst }}</p>
             <small>Sent at: {{ message.timestamp }}</small>
         {% endfor %}
     </div>
     <form method="post">
         {% csrf_token %}
         <textarea name="content" placeholder="Type your message here..." required></textarea><br>
-        <button type="submit">Send</button>
+        <button type="submit"class="btn btn-dark" >Send</button>
     </form>
 </body>
 </html>
