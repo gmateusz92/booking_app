@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+    <h1>My Apartments</h1>
+    <hr>
+    {% for apartment in apartments %}
+    <li class="list-group-item">
+        <strong></strong> 
+        
+        <!-- Dodanie małego zdjęcia apartamentu -->
+        {% if apartment.photos.first %}
+            <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }} Image" style="max-width: 500px; max-height: 100px; margin-right: 10px;">
+        {% endif %}
+        
+        <!-- Dodanie przycisku "Check Details" -->
+        <a href="{% url 'reservations:ApartmentDetailView' apartment.id %}" class="btn btn-dark" style="margin-top: 10px;">Check {{ apartment.name }} details</a>
+        
+        <!-- Dodaj inne pola oferty, jakie potrzebujesz -->
+    </li>
+{% endfor %}
+</div>
+
+
+{% endblock %}

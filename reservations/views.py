@@ -102,7 +102,7 @@ class ApartmentDetailView(View):
 def apartment_list(request):
     user = request.user
     apartments = Apartment.objects.filter(user=user)
-    return render(request, 'reservations/my_apartments.html', {'apartments': apartments})
+    return render(request, 'reservations/apartment_list.html', {'apartments': apartments})
 
 
 class AddApartmentView(View):

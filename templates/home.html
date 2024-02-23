@@ -23,7 +23,7 @@
 </div>
 
 <div class="text-center mb-3">
-    <h2 style="font-size: 20px;">Sort by Price:</h2>
+    
     <form class="form-inline" method="GET" action="{% url 'reservations:home' %}">
         {% csrf_token %}
         <select name="sort_by_price" class="form-select mr-sm-2" style="width: 150px;">

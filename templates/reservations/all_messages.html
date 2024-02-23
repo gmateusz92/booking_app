@@ -1,23 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2 class="text-center mb-3" style="font-size: 40px;">Messages box</h2>
-
 {% if bookings %}
-    <ul>
+<div class="container">
+    <h1>Your Booking List</h1>
+    <hr>
+    <ul class="list-group">
         {% for booking in bookings %}
-            <li>{{ booking }}</li>
-            <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-success">Chat</a>
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col-md-10">
+                    {{ booking }}
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-success">Chat</a>
+                </div>
+            </div>
+        </li>
         {% endfor %}
     </ul>
+</div>
 {% else %}
-    {% for message in messages %}
-        <li>{{ message }}</li>
-        <a href="{% url 'reservations:message_view' booking_id=message.booking.pk %}" class="btn btn-success">Chat</a>
-    {% endfor %}
+<div class="container">
+    <h1>Your Messages</h1>
+    <hr>
+    <ul class="list-group">
+        {% for message in messages %}
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col-md-10">
+                    {{ message }}
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'reservations:message_view' booking_id=message.booking.pk %}" class="btn btn-success">Chat</a>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
     {% if not messages %}
-        <p>You didn't received any message.</p>
+        <p>You haven't received any messages.</p>
     {% endif %}
+</div>
 {% endif %}
+
+
 
 {% endblock %}
