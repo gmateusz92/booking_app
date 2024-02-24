@@ -2,18 +2,18 @@
 
 {% block content %}
 <div class="container">
-    <h1>Booking List</h1>
+    <h1>Current Bookings</h1>
     <hr>
     <ul class="list-group">
         {% for booking in bookings %}
         <li class="list-group-item">
             <div class="row">
                 <div class="col-md-8">
-                    <p>Reservation {{ booking.name.name }} from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}.</p>
+                    <p>Reservation {{ booking.name.name|capfirst }} from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}.</p>
                 </div>
                 <div class="col-md-4">
                     <div class="btn-group" role="group">
-                        <a href="{% url 'reservations:DeleteBookingView' pk=booking.pk %}" class="btn btn-danger">Detele</a>
+                        
                         <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-primary">Send Message</a>
                     </div>
                 </div>

@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
-{% block content %}
 
+{% block content %}
 <div class="container">
     <h1>My Apartments</h1>
     <hr>
-    {% for apartment in apartments %}
-    <li class="list-group-item">
-        <strong></strong> 
-        
-        <!-- Dodanie małego zdjęcia apartamentu -->
-        {% if apartment.photos.first %}
-            <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }} Image" style="max-width: 500px; max-height: 100px; margin-right: 10px;">
-        {% endif %}
-        
-        <!-- Dodanie przycisku "Check Details" -->
-        <a href="{% url 'reservations:ApartmentDetailView' apartment.id %}" class="btn btn-dark" style="margin-top: 10px;">Check {{ apartment.name|capfirst }} Details</a>
-        
-        <!-- Dodaj inne pola oferty, jakie potrzebujesz -->
-    </li>
-{% endfor %}
+    <ul class="list-group">
+        {% for apartment in apartments %}
+        <li class="list-group-item">
+            <div class="row align-items-center"> 
+                <div class="col-md-6">
+                    <h5>{{ apartment.name|capfirst }}</h5>
+                    {% if apartment.photos.first %}
+                        <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }} Image" class="img-fluid">
+                    {% else %}
+                        <p class="text-center">No image available</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-2 text-end">
+                    <br>
+                    <a href="{% url 'reservations:ApartmentDetailView' apartment.id %}" class="btn btn-dark">Check Details</a>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
 </div>
-
-
 {% endblock %}
+

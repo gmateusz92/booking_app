@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Booking List</h1>
+    <hr>
+    <ul class="list-group">
+        {% if bookings %}
+            {% for booking in bookings %}
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if booking.name.photos.first %}
+                            <img src="{{ booking.name.photos.first.image.url }}" alt="Apartment Image" class="img-fluid">
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <p><strong>{{ booking.user.first_name|capfirst }} {{ booking.user.last_name|capfirst }} has reserved {{ booking.name.name|capfirst }} from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}.</strong></p>
+
+                        <p>Email: {{ booking.user.email }}</p>
+                        <p>Phone Number: {{ booking.user.phone_number }}</p>
+                        <p>Address: {{ booking.user.address }}</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'reservations:DeleteBookingView' pk=booking.pk %}" class="btn btn-danger">Delete</a>
+                            <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-primary">Send Message</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                No bookings yet.
+            </div>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+

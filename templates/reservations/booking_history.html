@@ -4,6 +4,7 @@
 <div class="container">
     <h1>Booking History</h1>
     <hr>
+    {% if bookings %}
     <ul class="list-group">
         {% for booking in bookings %}
         <li class="list-group-item">
@@ -28,5 +29,10 @@
         </li>
         {% endfor %}
     </ul>
+    {% else %}
+    <div class="alert alert-info text-center" role="alert">
+        There are no bookings in the history.
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

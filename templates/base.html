@@ -35,23 +35,34 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:myprofile' %}">My Profile</a>
+                            <a class="nav-link" href="{% url 'accounts:myprofile' %}">{{ user.email }}</a>
                         </li>
-                    {% if user|if_user_offer_apartment %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'reservations:apartment_list' %}">My Offers</a>
-                        </li>
-                    {% endif %}
-                    
-                    {% if user|if_user_has_bookings %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'reservations:booking_list' %}">Booking List</a>
-                        </li>
-                    {% endif %}
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'reservations:booking_history' %}">Booking History</a>
-                    </li>
+                        <li class="nav-item dropdown">
+                            {% if user|if_user_offer_apartment %} 
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              My Offers
+                            </a>
+                            {% endif %} 
+                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="{% url 'reservations:apartment_list' %}">My Apartments</a></li>
+                              <li><a class="dropdown-item" href="{% url 'reservations:vendor_booking_list' %}">My Bookings</a></li>
+                            </ul>
+                          </li>
+                          <li class="nav-item dropdown">
+                            {% if user|if_user_has_bookings %}
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              My Journeys
+                            </a>
+                            {% endif %}
+                            <ul class="dropdown-menu">
+                              {% if user|if_user_has_bookings %}  
+                              <li><a class="dropdown-item" href="{% url 'reservations:booking_list' %}">Current Bookings</a></li>
+                              {% endif %}
+                             
+                              <li><a class="dropdown-item" href="{% url 'reservations:booking_history' %}">Booking History</a></li>
+                              
+                            </ul>
+                          </li> 
                 {% endif %}
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -77,6 +88,8 @@
         </div>
     </div>
 </nav>
+
+
 
 
 

@@ -166,7 +166,21 @@ def booking_list(request):
     }
     return render(request, 'reservations/bookinglist.html', context)
  
-
+@login_required 
+def vendor_booking_list(request):
+    user = request.user
+    current_date = date.today()
+    user_apartments = Apartment.objects.filter(user=user)
+ 
+    owner_bookings = []
+    for apartment in user_apartments:
+        bookings = Booking.objects.filter(name=apartment, check_in__gte=current_date)
+        owner_bookings.extend(bookings)
+    
+    context = {
+        'bookings': owner_bookings
+    }
+    return render(request, 'reservations/vendor_booking_list.html', context)
 
 class CalendarView(ListView):
     model = Booking
@@ -227,6 +241,7 @@ class BookingView(View):
             booking = form.save(commit=False)
             booking.user = request.user
             booking.apartment = apartment  # Dodaj przypisanie apartamentu do rezerwacji
+            
             booking.save()
 
             #  # Wysyłanie wiadomości e-mailowej do użytkownika
@@ -287,7 +302,31 @@ class DeleteBookingView(View):
         else:
             # Jeśli użytkownik nie ma rezerwacji, przekierowujemy na stronę główną
             return redirect('reservations:home')
-              
+
+
+from django.db.models import Q
+
+# @login_required
+# def message_list(request):
+#     user = request.user
+#     # Pobieramy wszystkie wiadomości, w których użytkownik jest nadawcą lub odbiorcą
+#     messages = Message.objects.filter(Q(sender=user) | Q(receiver=user))
+#     # Pobieramy wszystkie rezerwacje użytkownika
+#     bookings = Booking.objects.filter(user=user)
+#     # Lista wiadomości od właściciela apartamentu
+#     conversations = []
+#     for message in messages:
+#         # Sprawdzamy, czy istnieje rezerwacja dla danej wiadomości
+#         if Booking.objects.filter(id=message.booking_id).exists():
+#             booking = Booking.objects.get(id=message.booking_id)
+#             # Sprawdzamy, czy aktualny użytkownik jest właścicielem apartamentu
+#             if booking.name.user == user:
+#                 conversations.append(message)
+#     context = {
+#         'conversations': conversations,
+#         'messages': messages
+#     }
+#     return render(request, 'reservations/all_messages.html', context)
 
 @login_required
 def message_view(request, booking_id):
@@ -311,6 +350,10 @@ def message_list(request):
         'messages': messages,
     }
     return render(request, 'reservations/all_messages.html', context)
+
+
+
+
 
 def read_opinions(request, apartment_id):
     bookings = Booking.objects.filter(name_id=apartment_id).exclude(comment=None)

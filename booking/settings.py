@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'vendor',
     'django.contrib.gis',
     'django_google_maps',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -167,3 +169,6 @@ EMAIL_HOST_USER = 'gmateusz92@gmail.com'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'BookingApp <gmateusz92@gmail.com>'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'

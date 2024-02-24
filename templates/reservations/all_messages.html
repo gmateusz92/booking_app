@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
+
 {% block content %}
+
+
 
 {% if bookings %}
 <div class="container">
@@ -10,7 +13,8 @@
         <li class="list-group-item">
             <div class="row">
                 <div class="col-md-10">
-                    {{ booking|capfirst }}.
+                    <p><strong>Message from {{ booking.name.user.username|capfirst }} regarding booking of {{ booking.name|capfirst }} from {{ booking.check_in|date:"d-m-Y" }} to {{ booking.check_out|date:"d-m-Y" }}.</strong></p>
+                </div>
                 </div>
                 <div class="col-md-2">
                     <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-dark">Chat</a>
@@ -26,16 +30,18 @@
     <hr>
     <ul class="list-group">
         {% for message in messages %}
-        <li class="list-group-item">
-            <div class="row">
-                <div class="col-md-10">
-                    {{ message }}
+            {% if message.sender != request.user %}
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-md-10">
+                        <p><strong>Message from {{ message.sender.first_name|capfirst }} {{ message.sender.last_name|capfirst }} regarding booking of {{ message.booking.name }} from {{ message.booking.check_in|date:"d-m-Y" }} to {{ message.booking.check_out|date:"d-m-Y" }}.</strong></p> 
+                    </div>
+                    <div class="col-md-2">
+                        <a href="{% url 'reservations:message_view' booking_id=message.booking.pk %}" class="btn btn-dark">Chat</a>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <a href="{% url 'reservations:message_view' booking_id=message.booking.pk %}" class="btn btn-success">Chat</a>
-                </div>
-            </div>
-        </li>
+            </li>
+            {% endif %}
         {% endfor %}
     </ul>
     {% if not messages %}
@@ -45,5 +51,5 @@
 {% endif %}
 
 
-
 {% endblock %}
+
