@@ -19,17 +19,6 @@ from django.db.models import Avg
 from datetime import date
 
 
-
-def map(request):
-    reservation_form = BookingForm()  # Inicjalizuj formularz rezerwacji
-
-    context = {
-        'reservation_form': reservation_form,  # Dodaj formularz do kontekstu
-        # 'google_maps_api_key': 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc',  # Zastąp kluczem API
-    }
-    return render(request, 'reservations/map.html', context)
-
-
 def home(request):
     query = request.GET.get('q', '')
     auto_complete_query = request.GET.get('id_address', '')
@@ -90,7 +79,6 @@ class ApartmentDetailView(View):
             'prev_month_url': prev_month_url,
             'next_month_url': next_month_url,
         }
-
     
         return render(request, 'reservations/apartment_detail.html', context)
     
@@ -219,14 +207,14 @@ class BookingView(View):
 
         cal = Calendar(year, month, apartment)
         html_cal = cal.formatmonth(withyear=True)
-        form = BookingForm(initial={'name': apartment.id})  # Ustawia wartość ukrytego pola
+        form = BookingForm(initial={'name': apartment.id}) 
 
         context = {
             'apartment': apartment,
             'calendar': mark_safe(html_cal),
             'prev_month_url': prev_month_url,
             'next_month_url': next_month_url,
-            'form': form,  # Dodaj formularz do kontekstu widoku
+            'form': form, 
         }
 
         return render(request, self.template_name, context)
@@ -310,7 +298,6 @@ def message_view(request, booking_id):
         sender = request.user
         receiver = apartment.user
         Message.objects.create(sender=sender, receiver=receiver, booking=booking, content=content)
-        # Optional: Add logic to handle message creation and redirection after sending
     messages = Message.objects.filter(booking=booking)
     return render(request, 'reservations/message.html', {'booking': booking, 'apartment': apartment, 'messages': messages})
 

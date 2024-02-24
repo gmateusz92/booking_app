@@ -112,39 +112,33 @@
                 </div>
             </div>
             {% if user.is_authenticated %}
-                        <div class="col-md-6">
-                            <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
-                                <br>
-                                <h2>Check availability and reserve</h2>
-                                <a href="{% url 'reservations:BookingView' pk=apartment.pk %}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reservationModal">Click and reserve</a>
-                            </div>
-                        </div>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="reservationModalLabel">Reservation</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>You are about to reserve this apartment. Are you sure you want to proceed?</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <a href="{% url 'reservations:BookingView' pk=apartment.pk %}" class="btn btn-primary">Confirm reservation</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="col-md-6">
-                            <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
-                                <p>You have to be logged in to reserve an apartment.</p>
-                            </div>
-                        </div>
-                    {% endif %}
+    {% if apartment.user == user %}
+        <div class="col-md-6">
+            <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                You cannot reserve your own apartment.
+            </div>
+        </div>
+    {% else %}
+        <div class="col-md-6">
+            <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
+                <h2>Check availability and reserve</h2>
+                <a href="{% url 'reservations:BookingView' pk=apartment.pk %}" class="btn btn-primary">Click and reserve</a>
+            </div>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="col-md-6">
+        <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
+            You have to be logged in to reserve an apartment.
+        </div>
+    </div>
+{% endif %}
                         
                     </div>
                 </div>
