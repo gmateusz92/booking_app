@@ -17,14 +17,12 @@
         <div class="feature col location-form">
             <form method="post" action="{% url 'reservations:BookingView' pk=apartment.pk %}" class="d-flex flex-column align-items-center justify-content-center">
                 {% csrf_token %}
-                {% if form.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {% for field, errors in form.errors.items %}
-                            {% for error in errors %}
-                                {{ error }}
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
                 <br>
                 {{ form }}

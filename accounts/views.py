@@ -82,7 +82,7 @@ def activate(request, uidb64, token): #aktywacja konta
 
 def login(request):
     if request.user.is_authenticated:
-        messages.warning(request, 'You are already logged in!')
+        
         return redirect('accounts:index')
     elif request.method == 'POST':
         email = request.POST['email']

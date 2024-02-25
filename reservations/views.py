@@ -205,6 +205,7 @@ class CalendarView(ListView):
 
         return context
      
+from django.utils.translation import gettext as _
 
 class BookingView(View):
     template_name = 'reservations/reserve_apartment.html'
@@ -238,33 +239,32 @@ class BookingView(View):
         form = BookingForm(request.POST)
 
         if form.is_valid():
-            booking = form.save(commit=False)
-            booking.user = request.user
-            booking.apartment = apartment  # Dodaj przypisanie apartamentu do rezerwacji
+            check_in = form.cleaned_data['check_in']
+            check_out = form.cleaned_data['check_out']
             
-            booking.save()
-
-            #  # Wysyłanie wiadomości e-mailowej do użytkownika
-            # user_subject = 'Potwierdzenie Twojej rezerwacji'
-            # user_message = f'Witaj {request.user.username},\n\nTwoja rezerwacja dla {apartment.name} została potwierdzona.'
-            # user_recipient_email = request.user.email
-            # send_mail(user_subject, user_message, None, [user_recipient_email])
-
-            # # Wysyłanie wiadomości e-mailowej do właściciela apartamentu
-            # owner_subject = 'Nowa rezerwacja dla Twojego apartamentu'
-            # owner_message = f'Właśnie dokonano nowej rezerwacji dla Twojego apartamentu {apartment.name}.'
-            # owner_recipient_email = apartment.user.email
-            # send_mail(owner_subject, owner_message, None, [owner_recipient_email])
-            # send verification email
-            user = apartment.user
-            mail_subject = 'You have new reservation!'
-            email_template = 'emails/reservation_done.html'
-            send_verification_email(request, user, mail_subject, email_template)
-
-            return redirect('reservations:booking_list')
-        else:
-            # form.errors.clear()
-            messages.error(request, form.errors['check_in'])
+            # Sprawdzenie, czy nowa rezerwacja nakłada się na istniejące
+            overlapping_bookings = Booking.objects.filter(
+                Q(check_out__gt=check_in, check_in__lt=check_out) |  # zarezerwowany przed wyjazdem lub po zameldowaniu
+                Q(check_in__lt=check_out, check_out__gt=check_in),  # wyjazd zameldowano przed zameldowaniem lub po zameldowaniu
+                name=apartment  # pole identyfikujące apartament w modelu Booking
+            )
+            if overlapping_bookings.exists():
+                messages.error(request, _("This apartment is already booked for the selected dates."))
+            elif Booking.objects.filter(check_in=check_out).exists() or Booking.objects.filter(check_out=check_in).exists():
+                messages.error(request, _("This apartment is already booked for the selected dates."))
+            else:
+                # Tworzenie nowej rezerwacji
+                booking = form.save(commit=False)
+                booking.user = request.user
+                booking.name = apartment  # przypisanie apartamentu do rezerwacji
+                booking.save()
+                user = apartment.user
+                mail_subject = _('You have a new reservation!')
+                email_template = 'emails/reservation_done.html'
+                send_verification_email(request, user, mail_subject, email_template)
+                return redirect('reservations:booking_list')
+            
+            
         
         d = get_date(request.GET.get('day', None))
         year, month = d.year, d.month
@@ -306,27 +306,6 @@ class DeleteBookingView(View):
 
 from django.db.models import Q
 
-# @login_required
-# def message_list(request):
-#     user = request.user
-#     # Pobieramy wszystkie wiadomości, w których użytkownik jest nadawcą lub odbiorcą
-#     messages = Message.objects.filter(Q(sender=user) | Q(receiver=user))
-#     # Pobieramy wszystkie rezerwacje użytkownika
-#     bookings = Booking.objects.filter(user=user)
-#     # Lista wiadomości od właściciela apartamentu
-#     conversations = []
-#     for message in messages:
-#         # Sprawdzamy, czy istnieje rezerwacja dla danej wiadomości
-#         if Booking.objects.filter(id=message.booking_id).exists():
-#             booking = Booking.objects.get(id=message.booking_id)
-#             # Sprawdzamy, czy aktualny użytkownik jest właścicielem apartamentu
-#             if booking.name.user == user:
-#                 conversations.append(message)
-#     context = {
-#         'conversations': conversations,
-#         'messages': messages
-#     }
-#     return render(request, 'reservations/all_messages.html', context)
 
 @login_required
 def message_view(request, booking_id):
@@ -337,19 +316,14 @@ def message_view(request, booking_id):
         sender = request.user
         receiver = apartment.user
         Message.objects.create(sender=sender, receiver=receiver, booking=booking, content=content)
+        
+        if sender != receiver:
+            mail_subject = 'You have a new message.'
+            email_template = 'emails/new_message.html'
+            send_verification_email(request, receiver, mail_subject, email_template)
+        
     messages = Message.objects.filter(booking=booking)
     return render(request, 'reservations/message.html', {'booking': booking, 'apartment': apartment, 'messages': messages})
-
-@login_required
-def message_list(request):
-    user=request.user
-    bookings = Booking.objects.filter(user=user)
-    messages = Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
-    context = {
-        'bookings': bookings,
-        'messages': messages,
-    }
-    return render(request, 'reservations/all_messages.html', context)
 
 
 

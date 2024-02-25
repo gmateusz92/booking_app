@@ -2,7 +2,7 @@ from django.urls import path
 from.views import (
     home, booking_list, ApartmentDetailView, AddApartmentView, 
     EditApartmentView, DeleteApartmentView, apartment_list, CalendarView, 
-    BookingView, DeleteBookingView, message_view, message_list, booking_history, 
+    BookingView, DeleteBookingView, message_view,  booking_history, 
     read_opinions, vendor_booking_list
 )
 
@@ -20,7 +20,7 @@ urlpatterns = [
     path('apartment/<int:pk>/reserve/', BookingView.as_view(), name='BookingView'),
     path('delete_booking/<int:pk>', DeleteBookingView.as_view(), name='DeleteBookingView'),
     path('message/<int:booking_id>/', message_view, name='message_view'),
-    path('messages/', message_list, name='message_list'),
+    
     path('apartment/<int:apartment_id>/opinions/', read_opinions, name='read_opinions'),
     path('booking_history/', booking_history, name='booking_history'),
     path('vendor_booking_list/', vendor_booking_list, name='vendor_booking_list'),

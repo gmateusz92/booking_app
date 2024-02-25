@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-
-
 {% if bookings %}
 <div class="container">
     <h1>Message Box</h1>
@@ -13,24 +10,24 @@
         <li class="list-group-item">
             <div class="row">
                 <div class="col-md-10">
-                    <p><strong>Message from {{ booking.name.user.username|capfirst }} regarding booking of {{ booking.name|capfirst }} from {{ booking.check_in|date:"d-m-Y" }} to {{ booking.check_out|date:"d-m-Y" }}.</strong></p>
-                </div>
+                    <p><strong>You sucessfully booked {{ booking.name|capfirst }}  from {{ booking.check_in|date:"d-m-Y" }} to {{ booking.check_out|date:"d-m-Y" }}.</strong></p>
                 </div>
                 <div class="col-md-2">
-                    <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-dark">Chat</a>
+                    <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-dark">Send Message</a>
                 </div>
             </div>
         </li>
         {% endfor %}
     </ul>
 </div>
-{% else %}
+{% endif %}
+
 <div class="container">
-    <h1>Your Messages</h1>
+    <h1>Message Box</h1>
     <hr>
     <ul class="list-group">
         {% for message in messages %}
-            {% if message.sender != request.user %}
+            {% if message.sender != request.user and message.booking.name == booking.name %}
             <li class="list-group-item">
                 <div class="row">
                     <div class="col-md-10">
@@ -48,7 +45,45 @@
         <p>You haven't received any messages.</p>
     {% endif %}
 </div>
-{% endif %}
+
+<div class="container">
+    <h1>Message Box</h1>
+    <hr>
+    <ul class="list-group">
+        {% for message in messages %}
+            {% if message.sender != request.user or message.receiver == request.user %}
+                {% if not message.booking.parent_message %}
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <p><strong>Message from {{ message.sender.first_name|capfirst }} {{ message.sender.last_name|capfirst }} regarding booking of {{ message.booking.name }} from {{ message.booking.check_in|date:"d-m-Y" }} to {{ message.booking.check_out|date:"d-m-Y" }}.</strong></p> 
+                            </div>
+                            <div class="col-md-2">
+                                <a href="{% url 'reservations:message_view' booking_id=message.booking.pk %}" class="btn btn-dark">Chat</a>
+                            </div>
+                        </div>
+                    </li>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {% if not messages %}
+    <p>You haven't received any messages.</p>
+    {% endif %}
+</div>
+
+
+</div>
+
+{% for message in messages %}
+<li>
+    <strong>From:</strong> {{ message.sender }} <br>
+    <strong>Regarding booking:</strong> {{ message.booking.name }} <br>
+    <strong>Content:</strong> {{ message.content }} <br>
+    <strong>Timestamp:</strong> {{ message.timestamp }}
+    <a href="{% url 'reservations:message_view' booking_id=message.booking.pk %}" class="btn btn-dark">Chat</a>
+</li>
+{% endfor %}
 
 
 {% endblock %}

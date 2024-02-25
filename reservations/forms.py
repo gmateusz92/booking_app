@@ -44,26 +44,27 @@ class BookingForm(forms.ModelForm):
             'check_out': forms.DateInput(attrs={'class': 'form-control narrow-input', 'type': 'date'}),
             'name': forms.HiddenInput(attrs={'required': False})
         }
-    def clean(self):
-        cleaned_data = super().clean()
-        check_in = cleaned_data.get('check_in')
-        check_out = cleaned_data.get('check_out')
-        name = cleaned_data.get('name')
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     check_in = cleaned_data.get('check_in')
+    #     check_out = cleaned_data.get('check_out')
+    #     name = cleaned_data.get('name')
 
-        if check_in and check_out and name:
-            # Sprawdź, czy istnieje inna rezerwacja w tym terminie dla tego samego apartamentu
-            overlapping_bookings = Booking.objects.filter(
-                name=name,
-                check_out__gt=check_in,
-                check_in__lt=check_out
-            )
+    #     if check_in and check_out and name:
+    #         # Sprawdź, czy istnieje inna rezerwacja w tym terminie dla tego samego apartamentu
+    #         overlapping_bookings = Booking.objects.filter(
+    #             name=name,
+    #             check_out__gt=check_in,
+    #             check_in__lt=check_out
+    #         )
 
-            if overlapping_bookings.exists():
+    #         if overlapping_bookings.exists():
                 
-
-                raise ValidationError({'check_in': 'Thiss apartment is already booked for the selected dates.'})
-
-        return cleaned_data
+    #             # self.add_error(None, "This apartment is already booked for the selected dates.")
+    #             # raise ValidationError({'__all__': 'This apartment is already booked for the selected dates.'})
+    #             raise forms.ValidationError("This apartment is already booked for the selected datesss.")
+            
+    #     return cleaned_data
     
 # class CommentForm(forms.ModelForm):
 #     class Meta:
