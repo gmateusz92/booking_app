@@ -360,12 +360,24 @@ def booking_history(request):
     return render(request, 'reservations/booking_history.html', {'bookings': bookings, 'form': form}) 
 
 
-def all_messages(request):
-    # Pobierz aktualnego użytkownika
-    current_user = request.user
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import NotificationPreference
+from .forms import NotificationPreferenceForm
+
+@login_required
+def notification_preference(request):
+    notification_pref, created = NotificationPreference.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        form = NotificationPreferenceForm(request.POST, instance=notification_pref)
+        if form.is_valid():
+            form.save()
+            return redirect('reservations:notification_preference')
+    else:
+        form = NotificationPreferenceForm(instance=notification_pref)
+    return render(request, 'reservations/notification_preference.html', {'form': form})
+
+
+
     
-    # Pobierz wszystkie wiadomości, które mają użytkownika jako nadawcę lub odbiorcę
-    messages_sent = Message.objects.filter(sender=current_user)
-    messages_received = Message.objects.filter(receiver=current_user)
     
-    return render(request, 'reservations/all_messages.html', {'messages_sent': messages_sent, 'messages_received': messages_received})

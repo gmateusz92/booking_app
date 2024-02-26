@@ -63,10 +63,10 @@ class Message(models.Model):
         return f"Message from {self.sender} to {self.receiver} regarding booking of {self.booking.name} from {self.booking.check_in.strftime('%d-%m-%Y')} to {self.booking.check_out.strftime('%d-%m-%Y')}"
     
 
-# class NotificationPreference(models.Model):
-#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     location = models.PointField(null=True, blank=True)  # Lokalizacja użytkownika
-#     radius = models.PositiveIntegerField(default=0)     # Promień powiadomień w kilometrach
+class NotificationPreference(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    location = gis_models.PointField(null=True, blank=True)  # Lokalizacja użytkownika
+    radius = models.PositiveIntegerField(default=0)     # Promień powiadomień w kilometrach
 
-#     def __str__(self):
-#         return f"Powiadomienia dla {self.user.username}"
+    def __str__(self):
+        return f"Powiadomienia dla {self.user.username}"

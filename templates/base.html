@@ -28,6 +28,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'reservations:home' %}">Home</a>
+        <a class="navbar-brand" href="{% url 'reservations:notification_preference' %}">Newsettler</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -68,7 +69,7 @@
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'reservations:all_messages' %}">
+                        <a class="nav-link" href="">
                             Mailbox
                             <i class="fas fa-envelope text-grey"></i>
                         </a>

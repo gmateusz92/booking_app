@@ -2,28 +2,30 @@
 
 {% block content %}
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Messages</title>
+    <title>Messages</title>
 </head>
 <body>
-    <h1>All Messages</h1>
+    <h1>Messages</h1>
     <ul>
         {% for message in messages %}
-        <li>
-            <strong>From:</strong> {{ message.sender }}<br>
-            <strong>To:</strong> {{ message.receiver }}<br>
-            <strong>Content:</strong> {{ message.content }}<br>
-            <strong>Sent:</strong> {{ message.timestamp }}<br>
-        </li>
+            <li>
+                <p><strong>From:</strong> {{ message.sender }}</p>
+                <p><strong>Content:</strong> {{ message.content }}</p>
+                <p><strong>Sent at:</strong> {{ message.timestamp }}</p>
+            </li>
+        {% empty %}
+            <li>No messages found.</li>
         {% endfor %}
     </ul>
 </body>
 </html>
+
+
 
 
 
