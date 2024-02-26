@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'django_google_maps',
     'crispy_forms',
-    'crispy_bootstrap5',
+    # 'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -166,7 +166,7 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT='587'
 EMAIL_HOST_USER = 'gmateusz92@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_PASSWORD = 'kdsm kvrg wwcu wauq'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'BookingApp <gmateusz92@gmail.com>'
 

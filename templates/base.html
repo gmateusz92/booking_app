@@ -68,7 +68,7 @@
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="">
+                        <a class="nav-link" href="{% url 'reservations:all_messages' %}">
                             Mailbox
                             <i class="fas fa-envelope text-grey"></i>
                         </a>

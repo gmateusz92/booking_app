@@ -17,6 +17,8 @@ from accounts.utils import send_verification_email
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Avg
 from datetime import date
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 
 def home(request):
@@ -314,18 +316,23 @@ def message_view(request, booking_id):
     if request.method == 'POST':
         content = request.POST.get('content')
         sender = request.user
-        receiver = apartment.user
-        Message.objects.create(sender=sender, receiver=receiver, booking=booking, content=content)
-        
-        if sender != receiver:
-            mail_subject = 'You have a new message.'
-            email_template = 'emails/new_message.html'
-            send_verification_email(request, receiver, mail_subject, email_template)
-        
+        receiver = booking.user
+        message = Message.objects.create(sender=sender, receiver=receiver, booking=booking, content=content)
+        if sender == apartment.user:
+            subject = 'You have a new message.'
+            template = 'emails/new_message.html'
+            context = {'message': message}
+            html_message = render_to_string(template, context)
+            send_mail(subject, '', None, [receiver.email], html_message=html_message)
+        else:  # Użytkownik rezerwujący wysyła wiadomość
+            subject = 'You have a new message.'
+            template = 'emails/new_message.html'
+            context = {'message': message}
+            html_message = render_to_string(template, context)
+            send_mail(subject, '', None, [apartment.user.email], html_message=html_message)
+
     messages = Message.objects.filter(booking=booking)
     return render(request, 'reservations/message.html', {'booking': booking, 'apartment': apartment, 'messages': messages})
-
-
 
 
 
@@ -351,3 +358,14 @@ def booking_history(request):
     else:
         form = CommentForm()
     return render(request, 'reservations/booking_history.html', {'bookings': bookings, 'form': form}) 
+
+
+def all_messages(request):
+    # Pobierz aktualnego użytkownika
+    current_user = request.user
+    
+    # Pobierz wszystkie wiadomości, które mają użytkownika jako nadawcę lub odbiorcę
+    messages_sent = Message.objects.filter(sender=current_user)
+    messages_received = Message.objects.filter(receiver=current_user)
+    
+    return render(request, 'reservations/all_messages.html', {'messages_sent': messages_sent, 'messages_received': messages_received})

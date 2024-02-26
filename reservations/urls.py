@@ -3,7 +3,7 @@ from.views import (
     home, booking_list, ApartmentDetailView, AddApartmentView, 
     EditApartmentView, DeleteApartmentView, apartment_list, CalendarView, 
     BookingView, DeleteBookingView, message_view,  booking_history, 
-    read_opinions, vendor_booking_list
+    read_opinions, vendor_booking_list, all_messages
 )
 
 app_name = 'reservations'
@@ -20,7 +20,7 @@ urlpatterns = [
     path('apartment/<int:pk>/reserve/', BookingView.as_view(), name='BookingView'),
     path('delete_booking/<int:pk>', DeleteBookingView.as_view(), name='DeleteBookingView'),
     path('message/<int:booking_id>/', message_view, name='message_view'),
-    
+    path('all_messages', all_messages, name = 'all_messages'),
     path('apartment/<int:apartment_id>/opinions/', read_opinions, name='read_opinions'),
     path('booking_history/', booking_history, name='booking_history'),
     path('vendor_booking_list/', vendor_booking_list, name='vendor_booking_list'),
