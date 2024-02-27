@@ -16,7 +16,22 @@
         {{ form.as_p }}
         <button type="submit">Save</button>
     </form>
+    
 </body>
 </html>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form.address.label_tag }}
+            {{ form.address }}
+        </div>
+        <div class="col-md-6">
+            {{ form.radius.label_tag }}
+            {{ form.radius }}
+        </div>
+        <button type="submit">Save</button>
+    </form>
 
 {% endblock %}

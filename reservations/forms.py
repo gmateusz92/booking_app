@@ -79,12 +79,22 @@ class CommentForm(forms.Form):
     rating = forms.IntegerField(label='Rating (1-5)', validators=[MinValueValidator(1), MaxValueValidator(5)])
 
 
-from django import forms
+
 from .models import NotificationPreference
 
 class NotificationPreferenceForm(forms.ModelForm):
     class Meta:
         model = NotificationPreference
-        fields = ['location', 'radius']
-
+        fields = ['address', 'country', 'city', 'latitude','longitude', 'radius', 'location']
+        widgets = {
+            
+            'radius': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
+            'address': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
+            'country': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
+            'city': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
+            'latitude': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
+            'longitude': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
+            'location': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
+            
+        }
         

@@ -65,7 +65,13 @@ class Message(models.Model):
 
 class NotificationPreference(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    location = gis_models.PointField(null=True, blank=True)  # Lokalizacja użytkownika
+    address = models.CharField(max_length=250, blank=True, null=True)
+    country = models.CharField(max_length=50, null=True)
+    city = models.CharField(max_length=50, null=True)
+    latitude = models.FloatField(max_length=20, blank=True, null=True)
+    longitude = models.FloatField(max_length=20, blank=True, null=True)
+    location = gis_models.PointField(null=True, blank=True, srid=4326)  # Lokalizacja użytkownika
+    geolocation = map_fields.GeoLocationField(max_length=100, null=True)
     radius = models.PositiveIntegerField(default=0)     # Promień powiadomień w kilometrach
 
     def __str__(self):
