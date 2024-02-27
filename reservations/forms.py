@@ -85,7 +85,7 @@ from .models import NotificationPreference
 class NotificationPreferenceForm(forms.ModelForm):
     class Meta:
         model = NotificationPreference
-        fields = ['address', 'country', 'city', 'latitude','longitude', 'radius', 'location']
+        fields = ['address', 'country', 'city', 'latitude','longitude', 'radius', ]
         widgets = {
             
             'radius': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),

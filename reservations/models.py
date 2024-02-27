@@ -74,5 +74,11 @@ class NotificationPreference(models.Model):
     geolocation = map_fields.GeoLocationField(max_length=100, null=True)
     radius = models.PositiveIntegerField(default=0)     # Promień powiadomień w kilometrach
 
+    def save(self, *args, **kwargs):
+        if self.latitude and self.longitude:
+            self.location = Point(float(self.longitude), float(self.latitude))
+            return super(NotificationPreference, self).save(*args, **kwargs)
+        return super(NotificationPreference, self).save(*args, **kwargs)
+
     def __str__(self):
         return f"Powiadomienia dla {self.user.username}"

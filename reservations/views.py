@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .utils import get_date
-from accounts.utils import send_verification_email
+from accounts.utils import send_verification_email, send_notification
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Avg
 from datetime import date
@@ -110,6 +110,8 @@ class AddApartmentView(View):
             photo = photo_form.save(commit=False)
             photo.apartment = apartment
             photo.save()
+
+            check_location(apartment.pk)
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
         return render(request, self.template_name, {'form': form, 'photo_form': photo_form})    
@@ -365,19 +367,74 @@ from django.contrib.auth.decorators import login_required
 from .models import NotificationPreference
 from .forms import NotificationPreferenceForm
 
-@login_required
-def notification_preference(request):
-    notification_pref, created = NotificationPreference.objects.get_or_create(user=request.user)
-    if request.method == 'POST':
-        form = NotificationPreferenceForm(request.POST, instance=notification_pref)
+# @login_required
+# def notification_preference(request):
+#     notification_pref, created = NotificationPreference.objects.get_or_create(user=request.user)
+#     if request.method == 'POST':
+#         form = NotificationPreferenceForm(request.POST, instance=notification_pref)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('reservations:notification_preference')
+#     else:
+#         form = NotificationPreferenceForm(instance=notification_pref)
+#     return render(request, 'reservations/notification_preference.html', {'form': form})
+
+class AddNotificationPreferenceView(View):
+    template_name = 'reservations/notification_preference.html'
+
+    def get(self, request):
+        form = NotificationPreferenceForm()
+        return render(request, self.template_name, {'form': form })
+    
+    def post(self, request):
+        form = NotificationPreferenceForm(request.POST)
+
         if form.is_valid():
-            form.save()
-            return redirect('reservations:notification_preference')
-    else:
-        form = NotificationPreferenceForm(instance=notification_pref)
-    return render(request, 'reservations/notification_preference.html', {'form': form})
+            notification = form.save(commit=False)
+            notification.user=request.user
+            notification.save()
+            return redirect('reservations:AddNotificationPreferenceView')
 
+        return render(request, self.template_name, {'form': form})
 
+from django.core.mail import EmailMessage
+from django.contrib.gis.measure import Distance
 
+def check_location(pk):
+    # Pobieramy wszystkie obiekty NotificationPreference
+    notification_preferences = NotificationPreference.objects.all()
     
+    # Pobieramy nowo dodany apartament o podanym identyfikatorze (pk)
+    apartment = Apartment.objects.get(pk=pk)
     
+    for notification_preference in notification_preferences:
+        # Sprawdzamy czy oba obiekty mają ustawione współrzędne
+        if notification_preference.latitude is not None and notification_preference.longitude is not None and apartment.latitude is not None and apartment.longitude is not None:
+            # Tworzymy punkt dla lokalizacji apartamentu i lokalizacji użytkownika
+            apartment_point = Point(apartment.longitude, apartment.latitude)
+            user_point = Point(notification_preference.longitude, notification_preference.latitude)
+            
+            # Obliczamy odległość między lokalizacją apartamentu a lokalizacją użytkownika
+            distance = user_point.distance(apartment_point)  # Odległość w jednostkach przestrzennych
+            
+            # Sprawdzamy czy odległość jest mniejsza lub równa radiusowi z NotificationPreference
+            if distance <= notification_preference.radius:
+                # Wysyłamy powiadomienie e-mail
+                # subject = 'Nowy apartament w pobliżu'
+                # message = render_to_string('emails/notification_email.html', {'apartment': apartment})
+                # context = {'to_email': notification_preference.user.email}
+                # send_notification(subject, message, context)
+                subject = 'Nowy apartament w pobliżu'
+                message = render_to_string('emails/notification_email.html', {'apartment': apartment})
+                to_email = notification_preference.user.email
+
+                email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [to_email])
+                email.send()
+                continue
+
+    # Po zakończeniu pętli zwracamy True, żeby poinformować o pomyślnym wysłaniu powiadomienia
+    return True
+    
+    from django.contrib.gis.geos import Point
+from reservations.models import NotificationPreference
+

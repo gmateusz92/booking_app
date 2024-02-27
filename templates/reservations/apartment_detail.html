@@ -4,6 +4,32 @@
 <div class="container">
     <h1>{{ apartment.name|capfirst }} Details</h1>   
     <hr>
+    <a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-dark">Edit</a>      
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the apartment "{{ apartment.name }}"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <form method="post" action="{% url 'reservations:DeleteApartmentView' pk=apartment.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{% url 'reservations:AddApartmentView' %}" class="btn btn-success">Add new apartment</a>
+    <p class="col-md-8 fs-4"> </p>
     <style>
         .property-info p {
             margin-bottom: 0; 
@@ -96,4 +122,10 @@
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&callback=initMap" async defer></script>
 
+
+
+
+
 {% endblock %}
+
+

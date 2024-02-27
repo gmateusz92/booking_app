@@ -2,7 +2,7 @@ from django.urls import path
 from.views import (
     home, booking_list, ApartmentDetailView, AddApartmentView, 
     EditApartmentView, DeleteApartmentView, apartment_list, CalendarView, 
-    BookingView, DeleteBookingView, message_view,  booking_history, notification_preference,
+    BookingView, DeleteBookingView, message_view,  booking_history, AddNotificationPreferenceView,
     read_opinions, vendor_booking_list, #all_messages, 
 )
 
@@ -24,7 +24,7 @@ urlpatterns = [
     path('apartment/<int:apartment_id>/opinions/', read_opinions, name='read_opinions'),
     path('booking_history/', booking_history, name='booking_history'),
     path('vendor_booking_list/', vendor_booking_list, name='vendor_booking_list'),
-    path('notification-preference/', notification_preference, name='notification_preference'), 
+    path('notification-preference/', AddNotificationPreferenceView.as_view(), name='AddNotificationPreferenceView'), 
 
 ]
 
