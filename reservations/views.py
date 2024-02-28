@@ -399,46 +399,40 @@ class AddNotificationPreferenceView(View):
 
 from django.core.mail import EmailMessage
 from django.contrib.gis.measure import Distance
+from geopy.distance import geodesic
+from django.contrib.gis.geos import Point
 
 def check_location(pk):
-    # Pobieramy wszystkie obiekty NotificationPreference
-    notification_preferences = NotificationPreference.objects.all()
-    
     # Pobieramy nowo dodany apartament o podanym identyfikatorze (pk)
     apartment = Apartment.objects.get(pk=pk)
     
-    for notification_preference in notification_preferences:
+    for notification_preference in NotificationPreference.objects.all():
         # Sprawdzamy czy oba obiekty mają ustawione współrzędne
-        if notification_preference.latitude is not None and notification_preference.longitude is not None and apartment.latitude is not None and apartment.longitude is not None:
+        if notification_preference.location is not None and apartment.location is not None:
             # Tworzymy punkt dla lokalizacji apartamentu i lokalizacji użytkownika
-            apartment_point = Point(apartment.longitude, apartment.latitude)
-            user_point = Point(notification_preference.longitude, notification_preference.latitude)
-            
+            apartment_point = apartment.location
+            user_point = notification_preference.location
+            print(apartment_point, user_point)
             # Obliczamy odległość między lokalizacją apartamentu a lokalizacją użytkownika
-            distance = user_point.distance(apartment_point)  # Odległość w jednostkach przestrzennych
-            
+            distance = geodesic((user_point.y, user_point.x), (apartment_point.y, apartment_point.x)).kilometers
+            print(distance)
             # Sprawdzamy czy odległość jest mniejsza lub równa radiusowi z NotificationPreference
             if distance <= notification_preference.radius:
                 # Wysyłamy powiadomienie e-mail
-                # subject = 'Nowy apartament w pobliżu'
-                # message = render_to_string('emails/notification_email.html', {'apartment': apartment})
-                # context = {'to_email': notification_preference.user.email}
-                # send_notification(subject, message, context)
                 subject = 'Nowy apartament w pobliżu'
-                message = render_to_string('emails/notification_email.html', {'apartment': apartment})
+                message = render_to_string('emails/notification_email.html', {'apartment': apartment, 'distance': distance})
                 to_email = notification_preference.user.email
 
                 email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [to_email])
                 email.send()
-                continue
-
+    
     # Po zakończeniu pętli zwracamy True, żeby poinformować o pomyślnym wysłaniu powiadomienia
     return True
     
 from django.shortcuts import render
 from django.contrib.gis.geos import Point
 from reservations.models import NotificationPreference
-from django.contrib.auth.models import User
+from accounts.models import User
 def radius_units_view(request):
     # Tworzymy punkt dla lokalizacji użytkownika
     user_point = Point(0, 0)
@@ -452,7 +446,7 @@ def radius_units_view(request):
     )
     
     # Sprawdzamy odległość dla różnych wartości
-    distances_to_test = [5000, 15000]  # Odległości w metrach
+    distances_to_test = [5000, 150000]  # Odległości w metrach
     
     results = []
     
@@ -464,5 +458,5 @@ def radius_units_view(request):
             result = f"Odległość {distance} metrów: NIE MIEŚCI SIĘ w promieniu {notification_preference.radius} kilometrów"
         results.append(result)
     
-    return render(request, 'reservation/radius_units.html', {'results': results})
+    return render(request, 'reservations/radius_units.html', {'results': results})
 
