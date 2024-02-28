@@ -383,8 +383,9 @@ class AddNotificationPreferenceView(View):
     template_name = 'reservations/notification_preference.html'
 
     def get(self, request):
+        preferences = NotificationPreference.objects.all()
         form = NotificationPreferenceForm()
-        return render(request, self.template_name, {'form': form })
+        return render(request, self.template_name, {'form': form, 'preferences': preferences })
     
     def post(self, request):
         form = NotificationPreferenceForm(request.POST)

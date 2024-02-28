@@ -16,7 +16,10 @@
         {{ form.as_p }}
         <button type="submit">Save</button>
     </form>
-    
+    {% for preference in preferences %}
+{{ preference.city }}   
+{{ preference.radius }}
+{% endfor %}
 </body>
 </html>
 
