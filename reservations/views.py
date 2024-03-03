@@ -444,25 +444,50 @@ class DeletePreferenceView(View):
         return redirect('reservations:AddNotificationPreferenceView')
 
 
+# import requests
+# from django.http import JsonResponse
+
+# def weather_timeline(request):
+#     # Twój klucz API
+#     api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'
+
+#     # URL do API
+#     url = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Białystok?unitGroup=metric&key={}&contentType=json'.format(api_key)
+
+#     # Pobieranie danych z API
+#     response = requests.get(url)
+
+#     # Sprawdzenie, czy odpowiedź jest poprawna (status kod 200)
+#     if response.status_code == 200:
+#         # Pobranie danych jako słownik JSON
+#         weather_data = response.json()
+#         # Zwrócenie danych w formie odpowiedzi JSON
+#         return JsonResponse(weather_data)
+#     else:
+#         # Jeśli odpowiedź nie jest poprawna, zwracamy pustą odpowiedź JSON
+#         return JsonResponse({'error': 'Failed to retrieve weather data'}, status=500)
+    
+
 import requests
-from django.http import JsonResponse
+from django.shortcuts import render
 
 def weather_timeline(request):
-    # Twój klucz API
-    api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'
-
-    # URL do API
-    url = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Białystok?unitGroup=metric&key={}&contentType=json'.format(api_key)
-
-    # Pobieranie danych z API
+    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Tignes?unitGroup=metric&key=6H8CDM5GQSPVME8X2Z7RGXKNZ&contentType=json"
     response = requests.get(url)
-
-    # Sprawdzenie, czy odpowiedź jest poprawna (status kod 200)
     if response.status_code == 200:
-        # Pobranie danych jako słownik JSON
-        weather_data = response.json()
-        # Zwrócenie danych w formie odpowiedzi JSON
-        return JsonResponse(weather_data)
+        data = response.json()
+        weather_data = []
+        for day in data["days"]:
+            weather_day = {
+                "humidity": day['humidity'],
+                "date": day["datetime"],
+                "temp_max": day["tempmax"],
+                "temp_min": day["tempmin"],
+                "snowdepth": day["snowdepth"],
+                "description": day["description"],
+            }
+            weather_data.append(weather_day)
+        return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data})
     else:
-        # Jeśli odpowiedź nie jest poprawna, zwracamy pustą odpowiedź JSON
-        return JsonResponse({'error': 'Failed to retrieve weather data'}, status=500)
+        error_message = "Błąd podczas pobierania danych pogodowych"
+        return render(request, 'error.html', {'error_message': error_message})    
