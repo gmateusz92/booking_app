@@ -12,7 +12,7 @@ from django.views.generic import ListView
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .utils import get_date
+from .utils import get_date, check_location
 from accounts.utils import send_verification_email, send_notification
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Avg
@@ -383,7 +383,7 @@ class AddNotificationPreferenceView(View):
     template_name = 'reservations/notification_preference.html'
 
     def get(self, request):
-        preferences = NotificationPreference.objects.all()
+        preferences = NotificationPreference.objects.filter(user=request.user)
         form = NotificationPreferenceForm()
         return render(request, self.template_name, {'form': form, 'preferences': preferences })
     
@@ -398,66 +398,71 @@ class AddNotificationPreferenceView(View):
 
         return render(request, self.template_name, {'form': form})
 
-from django.core.mail import EmailMessage
-from django.contrib.gis.measure import Distance
-from geopy.distance import geodesic
-from django.contrib.gis.geos import Point
+# class AddNotificationPreferenceView(View):
+#     template_name = 'reservations/notification_preference.html'
 
-def check_location(pk):
-    # Pobieramy nowo dodany apartament o podanym identyfikatorze (pk)
-    apartment = Apartment.objects.get(pk=pk)
+#     def get(self, request):
+#         # Sprawdź, czy preferencje powiadomień już istnieją dla bieżącego użytkownika
+#         existing_preference = NotificationPreference.objects.filter(user=request.user).first()
+#         if existing_preference:
+#             return render(request, self.template_name, {'preferences': existing_preference })
+#         else:
+#             form = NotificationPreferenceForm()
+#             return render(request, self.template_name, {'form': form})
     
-    for notification_preference in NotificationPreference.objects.all():
-        # Sprawdzamy czy oba obiekty mają ustawione współrzędne
-        if notification_preference.location is not None and apartment.location is not None:
-            # Tworzymy punkt dla lokalizacji apartamentu i lokalizacji użytkownika
-            apartment_point = apartment.location
-            user_point = notification_preference.location
-            print(apartment_point, user_point)
-            # Obliczamy odległość między lokalizacją apartamentu a lokalizacją użytkownika
-            distance = geodesic((user_point.y, user_point.x), (apartment_point.y, apartment_point.x)).kilometers
-            print(distance)
-            # Sprawdzamy czy odległość jest mniejsza lub równa radiusowi z NotificationPreference
-            if distance <= notification_preference.radius:
-                # Wysyłamy powiadomienie e-mail
-                subject = 'Nowy apartament w pobliżu'
-                message = render_to_string('emails/notification_email.html', {'apartment': apartment, 'distance': distance})
-                to_email = notification_preference.user.email
+#     def post(self, request):
+#         form = NotificationPreferenceForm(request.POST)
 
-                email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [to_email])
-                email.send()
-    
-    # Po zakończeniu pętli zwracamy True, żeby poinformować o pomyślnym wysłaniu powiadomienia
-    return True
-    
-from django.shortcuts import render
-from django.contrib.gis.geos import Point
-from reservations.models import NotificationPreference
-from accounts.models import User
-def radius_units_view(request):
-    # Tworzymy punkt dla lokalizacji użytkownika
-    user_point = Point(0, 0)
-    user = User.objects.first()
-    # Tworzymy przykładową preferencję powiadomień
-    notification_preference = NotificationPreference.objects.create(
-        user=user,
-        latitude=0, 
-        longitude=0, 
-        radius=10  # Promień w kilometrach
-    )
-    
-    # Sprawdzamy odległość dla różnych wartości
-    distances_to_test = [5000, 150000]  # Odległości w metrach
-    
-    results = []
-    
-    for distance in distances_to_test:
-        # Sprawdzamy, czy odległość mieści się w zasięgu promienia
-        if distance <= notification_preference.radius * 1000:  # Zamiana kilometrów na metry
-            result = f"Odległość {distance} metrów: MIEŚCI SIĘ w promieniu {notification_preference.radius} kilometrów"
-        else:
-            result = f"Odległość {distance} metrów: NIE MIEŚCI SIĘ w promieniu {notification_preference.radius} kilometrów"
-        results.append(result)
-    
-    return render(request, 'reservations/radius_units.html', {'results': results})
+#         if form.is_valid():
+#             # Sprawdź, czy preferencje powiadomień już istnieją dla bieżącego użytkownika
+#             existing_preference = NotificationPreference.objects.filter(user=request.user).first()
+#             if existing_preference:
+#                 # Aktualizuj istniejące preferencje
+#                 existing_preference.address = form.cleaned_data['address']
+#                 existing_preference.radius = form.cleaned_data['radius']
+#                 existing_preference.save()
+#             else:
+#                 # Utwórz nowe preferencje
+#                 notification = form.save(commit=False)
+#                 notification.user=request.user
+#                 notification.save()
+#             return redirect('reservations:AddNotificationPreferenceView')
 
+#         return render(request, self.template_name, {'form': form})
+
+
+
+    
+
+class DeletePreferenceView(View):
+    def get(self, request, pk):
+        preference = NotificationPreference.objects.get(pk=pk)
+        # Sprawdź, czy preferencja należy do zalogowanego użytkownika
+        if preference.user == request.user:
+            # Usuń preferencję
+            preference.delete()
+        return redirect('reservations:AddNotificationPreferenceView')
+
+
+import requests
+from django.http import JsonResponse
+
+def weather_timeline(request):
+    # Twój klucz API
+    api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'
+
+    # URL do API
+    url = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Białystok?unitGroup=metric&key={}&contentType=json'.format(api_key)
+
+    # Pobieranie danych z API
+    response = requests.get(url)
+
+    # Sprawdzenie, czy odpowiedź jest poprawna (status kod 200)
+    if response.status_code == 200:
+        # Pobranie danych jako słownik JSON
+        weather_data = response.json()
+        # Zwrócenie danych w formie odpowiedzi JSON
+        return JsonResponse(weather_data)
+    else:
+        # Jeśli odpowiedź nie jest poprawna, zwracamy pustą odpowiedź JSON
+        return JsonResponse({'error': 'Failed to retrieve weather data'}, status=500)

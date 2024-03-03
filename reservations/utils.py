@@ -1,6 +1,12 @@
 from calendar import HTMLCalendar
-from .models import Booking
+from .models import Booking, Apartment,NotificationPreference
 from datetime import datetime, date
+from django.template.loader import render_to_string
+from booking import settings
+from django.core.mail import EmailMessage
+from django.contrib.gis.measure import Distance
+from geopy.distance import geodesic
+from django.contrib.gis.geos import Point
 
 class Calendar(HTMLCalendar):
     def __init__(self, year=None, month=None, apartment=None):
@@ -43,3 +49,53 @@ def get_date(req_day):
             year, month = (int(x) for x in req_day.split('-'))
             return date(year, month, day=1)
         return datetime.today() 
+
+
+
+def check_location(pk):
+    # Pobieramy nowo dodany apartament o podanym identyfikatorze (pk)
+    apartment = Apartment.objects.get(pk=pk)
+    
+    for notification_preference in NotificationPreference.objects.all():
+        # Sprawdzamy czy oba obiekty mają ustawione współrzędne
+        if notification_preference.location is not None and apartment.location is not None:
+            # Tworzymy punkt dla lokalizacji apartamentu i lokalizacji użytkownika
+            apartment_point = apartment.location
+            user_point = notification_preference.location
+            print(apartment_point, user_point)
+            # Obliczamy odległość między lokalizacją apartamentu a lokalizacją użytkownika
+            distance = geodesic((user_point.y, user_point.x), (apartment_point.y, apartment_point.x)).kilometers
+            print(distance)
+            # Sprawdzamy czy odległość jest mniejsza lub równa radiusowi z NotificationPreference
+            if distance <= notification_preference.radius:
+                # Wysyłamy powiadomienie e-mail
+                subject = 'Nowy apartament w pobliżu'
+                message = render_to_string('emails/notification_email.html', {'apartment': apartment, 'distance': distance})
+                to_email = notification_preference.user.email
+
+                email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [to_email])
+                email.send()
+    
+    # Po zakończeniu pętli zwracamy True, żeby poinformować o pomyślnym wysłaniu powiadomienia
+    return True
+
+
+import requests
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+def get_bergfex_data():
+    url = "http://www.bergfex.at/oesterreich/schneewerte/"
+    response = requests.get(url)
+    if response.status_code == 200:
+        try:
+            data = response.json()
+            return data
+        except json.JSONDecodeError as e:
+            logger.error("Error decoding JSON: %s", e)
+            return None
+    else:
+        logger.error("Error fetching data from Bergfex API: %s", response.status_code)
+        return None

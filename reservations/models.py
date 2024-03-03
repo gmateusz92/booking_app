@@ -64,7 +64,7 @@ class Message(models.Model):
     
 
 class NotificationPreference(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     address = models.CharField(max_length=250, blank=True, null=True)
     country = models.CharField(max_length=50, null=True)
     city = models.CharField(max_length=50, null=True)
