@@ -3,7 +3,7 @@ from.views import (
     home, booking_list, ApartmentDetailView, AddApartmentView, 
     EditApartmentView, DeleteApartmentView, apartment_list, CalendarView, 
     BookingView, DeleteBookingView, message_view,  booking_history, AddNotificationPreferenceView,
-    read_opinions, vendor_booking_list, DeletePreferenceView, weather_timeline  #all_messages, 
+    read_opinions, vendor_booking_list, DeletePreferenceView, weather_timeline, weather  #all_messages, 
 )
 
 app_name = 'reservations'
@@ -26,8 +26,8 @@ urlpatterns = [
     path('vendor_booking_list/', vendor_booking_list, name='vendor_booking_list'),
     path('notification-preference/', AddNotificationPreferenceView.as_view(), name='AddNotificationPreferenceView'), 
     path('delete-preference/<int:pk>/', DeletePreferenceView.as_view(), name='DeletePreferenceView'),
-    path('weather-timeline/', weather_timeline, name='weather_timeline')
-
+    path('weather-timeline/', weather_timeline, name='weather_timeline'),
+    path('weather/', weather, name='weather'),
 ]
 
 

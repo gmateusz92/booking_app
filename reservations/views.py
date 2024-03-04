@@ -491,3 +491,67 @@ def weather_timeline(request):
     else:
         error_message = "Błąd podczas pobierania danych pogodowych"
         return render(request, 'error.html', {'error_message': error_message})    
+    
+
+import requests
+from django.shortcuts import render
+
+# def get_weather_data(latitude, longitude):
+#     api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'  # Tutaj wpisz swój klucz API
+#     url = f'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{latitude},{longitude}?unitGroup=metric&key={api_key}&contentType=json'
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         data = response.json()
+#         weather_data = []
+#         for day in data["days"]:
+#             weather_day = {
+#                 "humidity": day['humidity'],
+#                 "date": day["datetime"],
+#                 "temp_max": day["tempmax"],
+#                 "temp_min": day["tempmin"],
+#                 "snowdepth": day["snowdepth"],
+#                 "description": day["description"],
+#             }
+#             weather_data.append(weather_day)
+#             print(weather_data)
+#         return weather_data
+#     else:
+#         return None
+
+# def weather(request):
+#     if 'latitude' in request.GET and 'longitude' in request.GET:
+#         latitude = request.GET['latitude']
+#         longitude = request.GET['longitude']
+#         weather_data = get_weather_data(latitude, longitude)
+#         print(weather_data)
+#         return render(request, 'reservations/template.html', {'weather_data': weather_data})
+#     else:
+#         return render(request, 'reservations/template.html')
+
+def weather(request):
+    api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'  # Tutaj wpisz swój klucz API
+    
+    if 'latitude' in request.GET and 'longitude' in request.GET:
+        latitude = request.GET['latitude']
+        longitude = request.GET['longitude']
+        url = f'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{latitude},{longitude}?unitGroup=metric&key={api_key}&contentType=json'
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            data = response.json()
+            weather_data = []
+            for day in data["days"]:
+                weather_day = {
+                    "humidity": day['humidity'],
+                    "date": day["datetime"],
+                    "temp_max": day["tempmax"],
+                    "temp_min": day["tempmin"],
+                    "snowdepth": day["snowdepth"],
+                    "description": day["description"],
+                }
+                weather_data.append(weather_day)
+                print(weather_data)
+            return render(request, 'reservations/template.html', {'weather_data': weather_data})
+        
+    return render(request, 'reservations/template.html')
+
