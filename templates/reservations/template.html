@@ -31,13 +31,17 @@
                 navigator.geolocation.getCurrentPosition(function(position) {
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
-                    
+                    console.log("Latitude:", latitude);
+                    console.log("Longitude:", longitude);
                     // Wyślij współrzędne do widoku Django
                     fetch(`/weather/?latitude=${latitude}&longitude=${longitude}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log("Response status:", response.status);
+                        return response.json();
+                    })
                     .then(data => {
                         // Wyświetl informacje o pogodzie na stronie
-                        console.log(data);
+                        console.log("Weather data:", data);
                         var weatherDataDiv = document.getElementById('weather-data');
                         weatherDataDiv.innerHTML = `
                             <p>Location: ${data.resolvedAddress}</p>

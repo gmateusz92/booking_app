@@ -1,23 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
-    
 
-<div class="d-flex justify-content-center align-items-center" style="height: 30vh;">
-    <div>
-        <h1 class="text-center mb-3">Search location</h1>
-        <form class="form-inline" method="GET" action="{% url 'reservations:home' %}">
-            {% csrf_token %}
-            <input id="id_address" name="q" class="form-control mr-sm-2" style="width: 350px;" type="search" placeholder="Start typing city..." aria-label="Search" value="{{ request.GET.q }}">
-            <button class="btn btn-dark my-2 my-sm-0" type="submit">Search</button>
-        </form>
-        <br>
-        <div class="text-center mb-3">
-            {% if request.user.is_authenticated %}
-                <h2 style="font-size: 40px;">... or add your offer.</h2>
-                <a href="{% url 'reservations:AddApartmentView' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; font-size: 16px; background-color: #2e2f2e; color: white; text-decoration: none; border: none; border-radius: 5px; cursor: pointer;">Click to add</a>
-            {% else %}
-                <h2 style="font-size: 40px;">Login to add offer</h2>
-            {% endif %}
+<div class="container-fluid" >
+    <div class="row" >
+        <div class="col-md-6" >
+            <div class="d-flex justify-content-center align-items-center" style="height: 30vh;">
+                <div>
+                    <h1 class="text-center mb-3">Search location</h1>
+                    <form class="form-inline" method="GET" action="{% url 'reservations:home' %}">
+                        {% csrf_token %}
+                        <input id="id_address" name="q" class="form-control mr-sm-2" style="width: 350px;" type="search" placeholder="Start typing city..." aria-label="Search" value="{{ request.GET.q }}">
+                        <button class="btn btn-dark my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                    
+                    <br>
+                    <div class="text-center mb-3">
+                        {% if request.user.is_authenticated %}
+                            <h2 style="font-size: 40px;">... or add your offer.</h2>
+                            <a href="{% url 'reservations:AddApartmentView' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; font-size: 16px; background-color: #2e2f2e; color: white; text-decoration: none; border: none; border-radius: 5px; cursor: pointer;">Click to add</a>
+                        {% else %}
+                            <h2 style="font-size: 40px;">Login to add offer</h2>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 ">
+            <div class="card text-white bg-dark mb-6  ">
+                <div class="card-body" >
+                    {% if weather_data %}
+                        <h4>Weather in {{ weather_data.address }}</h4>
+                        Temperature: {{ weather_data.currentConditions.temp }}°C
+                        Max Temperature: {{ weather_data.days.0.tempmax }}°C
+                        <p>Min Temperature: {{ weather_data.days.0.tempmin }}°C</p>
+                        <p>{{ weather_data.description }}</p>
+                        <!-- Add more fields as needed -->
+                    {% else %}
+                        <p>Type city in searchbar to check weather</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -32,6 +55,7 @@
         <button class="btn btn-dark my-2 my-sm-0" type="submit">Apply</button>
     </form>
 </div>
+
 <br>
 <br>
 
@@ -78,11 +102,7 @@
         </p>
     </div>
 </footer>
-<script src="/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-</body>
-</html>
 
-       
- 
-    
+<script src="/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
 {% endblock %}

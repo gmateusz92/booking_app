@@ -49,11 +49,29 @@ def home(request):
     elif sort_by_price == 'desc':
         apartments = apartments.order_by('-price')            
 
+    # if apartments:
+    #     first_apartment = apartments.first()
+    #     weather_data = get_weather_data(first_apartment.city)  # Tutaj przekazujesz nazwę miasta jako argument
+    # else:
+    #     weather_data = None
+    weather_data = get_weather_data(query)
+    
     context = {
         'apartments': apartments,
+        'weather_data': weather_data,
     }
     return render(request, 'home.html', context)
 
+def get_weather_data(city):
+    api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'  # Tutaj wpisz swój klucz API
+    url = f'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}?unitGroup=metric&key={api_key}&contentType=json'
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return None
 
 class ApartmentDetailView(View):
     template_name = 'reservations/apartment_detail.html'
@@ -472,7 +490,7 @@ import requests
 from django.shortcuts import render
 
 def weather_timeline(request):
-    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Tignes?unitGroup=metric&key=6H8CDM5GQSPVME8X2Z7RGXKNZ&contentType=json"
+    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/52.2296756,21.0122287?unitGroup=metric&key=6H8CDM5GQSPVME8X2Z7RGXKNZ&contentType=json"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
@@ -487,6 +505,7 @@ def weather_timeline(request):
                 "description": day["description"],
             }
             weather_data.append(weather_day)
+            print('siema')
         return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data})
     else:
         error_message = "Błąd podczas pobierania danych pogodowych"
@@ -495,63 +514,4 @@ def weather_timeline(request):
 
 import requests
 from django.shortcuts import render
-
-# def get_weather_data(latitude, longitude):
-#     api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'  # Tutaj wpisz swój klucz API
-#     url = f'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{latitude},{longitude}?unitGroup=metric&key={api_key}&contentType=json'
-#     response = requests.get(url)
-#     if response.status_code == 200:
-#         data = response.json()
-#         weather_data = []
-#         for day in data["days"]:
-#             weather_day = {
-#                 "humidity": day['humidity'],
-#                 "date": day["datetime"],
-#                 "temp_max": day["tempmax"],
-#                 "temp_min": day["tempmin"],
-#                 "snowdepth": day["snowdepth"],
-#                 "description": day["description"],
-#             }
-#             weather_data.append(weather_day)
-#             print(weather_data)
-#         return weather_data
-#     else:
-#         return None
-
-# def weather(request):
-#     if 'latitude' in request.GET and 'longitude' in request.GET:
-#         latitude = request.GET['latitude']
-#         longitude = request.GET['longitude']
-#         weather_data = get_weather_data(latitude, longitude)
-#         print(weather_data)
-#         return render(request, 'reservations/template.html', {'weather_data': weather_data})
-#     else:
-#         return render(request, 'reservations/template.html')
-
-def weather(request):
-    api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'  # Tutaj wpisz swój klucz API
-    
-    if 'latitude' in request.GET and 'longitude' in request.GET:
-        latitude = request.GET['latitude']
-        longitude = request.GET['longitude']
-        url = f'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{latitude},{longitude}?unitGroup=metric&key={api_key}&contentType=json'
-        response = requests.get(url)
-        
-        if response.status_code == 200:
-            data = response.json()
-            weather_data = []
-            for day in data["days"]:
-                weather_day = {
-                    "humidity": day['humidity'],
-                    "date": day["datetime"],
-                    "temp_max": day["tempmax"],
-                    "temp_min": day["tempmin"],
-                    "snowdepth": day["snowdepth"],
-                    "description": day["description"],
-                }
-                weather_data.append(weather_day)
-                print(weather_data)
-            return render(request, 'reservations/template.html', {'weather_data': weather_data})
-        
-    return render(request, 'reservations/template.html')
 
