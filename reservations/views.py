@@ -56,9 +56,13 @@ def home(request):
     #     weather_data = None
     weather_data = get_weather_data(query)
     
+    
+
     context = {
         'apartments': apartments,
         'weather_data': weather_data,
+        
+
     }
     return render(request, 'home.html', context)
 
@@ -490,7 +494,8 @@ import requests
 from django.shortcuts import render
 
 def weather_timeline(request):
-    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/52.2296756,21.0122287?unitGroup=metric&key=6H8CDM5GQSPVME8X2Z7RGXKNZ&contentType=json"
+    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Warszawa?unitGroup=metric&key=Z9WKQT48NZFKQSPCRKQCQX454&contentType=json"
+    # url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Warszawa?unitGroup=metric&key=6H8CDM5GQSPVME8X2Z7RGXKNZ&contentType=json"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
@@ -509,7 +514,7 @@ def weather_timeline(request):
         return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data})
     else:
         error_message = "Błąd podczas pobierania danych pogodowych"
-        return render(request, 'error.html', {'error_message': error_message})    
+        return redirect('reservations:home')    
     
 
 import requests

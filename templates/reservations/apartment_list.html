@@ -1,29 +1,34 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+
+
 <div class="container">
     <h1>My Apartments</h1>
+    <a href="{% url 'reservations:AddApartmentView' %}" class="btn btn-dark mt-3">Add New</a>
     <hr>
     <ul class="list-group">
         {% for apartment in apartments %}
-        <li class="list-group-item">
+        <li class="list-group-item bg-dark mb-1">
             <div class="row align-items-center"> 
-                <div class="col-md-6">
+                <div class="col-md-8">
                     <h5>{{ apartment.name|capfirst }}</h5>
                     {% if apartment.photos.first %}
                         <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }} Image" class="img-fluid">
                     {% else %}
-                        <p class="text-center">No image available</p>
+                        <p class="text-center text-white">No image available</p>
                     {% endif %}
                 </div>
                 <div class="col-md-2 text-end">
                     <br>
-                    <a href="{% url 'reservations:ApartmentDetailView' apartment.id %}" class="btn btn-dark">Check Details</a>
+                    <a href="{% url 'reservations:ApartmentDetailView' apartment.id %}" class="btn btn-light">Check Details</a>
                 </div>
             </div>
         </li>
         {% endfor %}
     </ul>
 </div>
+
 {% endblock %}
 

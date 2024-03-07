@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'django_google_maps',
     'crispy_forms',
+    'widget_tweaks',
     # 'crispy_bootstrap5',
 ]
 

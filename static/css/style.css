@@ -233,3 +233,6 @@ width: 70px;  /* Dostosuj szerokość według potrzeb */
 height: 50px;
 }
 
+.right-align {
+  text-align: right;
+}
