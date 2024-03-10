@@ -8,12 +8,12 @@
     <hr>
     <ul class="list-group">
         {% for apartment in apartments %}
-        <li class="list-group-item bg-dark mb-1">
+        <li class="list-group-item bg-dark mb-3">
             <div class="row align-items-center text-white"> 
-                <div class="col-md-8 ">
+                <div class="col-md-10 ">
                     <h5>{{ apartment.name|capfirst }}</h5>
                     {% if apartment.photos.first %}
-                        <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }} Image" class="img-fluid">
+                    <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }} Image" class="img-fluid" style="width: 200px; height: 150px;">
                     {% else %}
                         <p class="text-center text-white">No image available</p>
                     {% endif %}

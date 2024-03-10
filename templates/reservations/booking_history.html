@@ -17,9 +17,18 @@
     <ul class="list-group">
         {% for booking in bookings %}
         <li class="list-group-item bg-dark">
-            <div class="row">
-                <div class="col-md-8"><br>
-                   <h4> <p class="text-white fw-bold">Reservation {{ booking.name.name }} from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}.</p></h4>
+            <div class="row ">
+                <div class="col-md-8">
+                    <br>
+                    <div class="d-flex align-items-center">
+                        {% if booking.name.photos.first %}
+                            <img src="{{ booking.name.photos.first.image.url }}" alt="Apartment Photo" class="img-thumbnail me-3" style="width: 100px;">
+                        {% endif %}
+                        <h4 class="text-white fw-bold mb-0">
+                            Reservation {{ booking.name.name|capfirst }} from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}.
+                        </h4>
+                    </div>
+                    <br>
                 </div>
                 <div class="col-md-4">
                     {% if not booking.comment %}    
@@ -52,10 +61,6 @@
                             <button type="submit" class="btn btn-light">Add Opinion and Rate</button>
                         </div>
                     </form>
-                    
-                    
-                    
-                    
                     {% else %}
                     <p><strong>Opinion:</strong> {{ booking.comment }}</p>
                     <p><strong>Rate:</strong> {{ booking.rating }}</p>
@@ -71,4 +76,7 @@
     </div>
     {% endif %}
 </div>
+
+
+
 {% endblock %}

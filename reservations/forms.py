@@ -2,6 +2,7 @@ from django import forms
 from .models import Apartment, Photo, Booking #, Comment
 from django.core.exceptions import ValidationError
 from django.contrib import messages
+from multiupload.fields import MultiFileField
 
 class ApartmentForm(forms.ModelForm):
     class Meta:
@@ -22,6 +23,7 @@ class ApartmentForm(forms.ModelForm):
         }
 
 class PhotoForm(forms.ModelForm):
+    image = MultiFileField(max_num=8, min_num=1, max_file_size=1024*1024*5)
     class Meta:
         model = Photo
         fields = ['image']

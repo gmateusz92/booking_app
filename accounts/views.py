@@ -106,25 +106,47 @@ def logout(request):
     messages.info(request, 'You are logged out.')
     return redirect('accounts:login')
 
+from .models import UserProfile
 
 
+# @login_required(login_url='login')
+# def myprofile(request):
+#     user_profile = UserProfile.objects.get(user=request.user)
+#     if request.method == 'POST':
+#         form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+#         if form.is_valid():
+#             profil = form.save(commit=False)
+#             profil.user = request.user
+#             profil.save()
+#             messages.success(request, 'Profil zaktualizowany pomyślnie!')
+#             return redirect('accounts:myprofile')  # zakładając, że masz URL o nazwie 'myprofile'
+#         else:
+#             messages.error(request, 'Błąd aktualizacji profilu. Proszę poprawić poniższe błędy.')
+#     else:
+#         form = UserProfileForm(instance=request.user.profile if hasattr(request.user, 'profile') else None)
+#     return render(request, 'accounts/myprofile.html', {'form': form})
+
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_required(login_url='login')
-def myprofile(request):
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        if form.is_valid():
-            profil = form.save(commit=False)
-            profil.user = request.user
-            profil.save()
-            messages.success(request, 'Profil zaktualizowany pomyślnie!')
-            return redirect('accounts:myprofile')  # zakładając, że masz URL o nazwie 'myprofile'
-        else:
-            messages.error(request, 'Błąd aktualizacji profilu. Proszę poprawić poniższe błędy.')
-    else:
-        form = UserProfileForm(instance=request.user.profile if hasattr(request.user, 'profile') else None)
-    return render(request, 'accounts/myprofile.html', {'form': form})
+def my_profile(request):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        user_profile = UserProfile.objects.create(user=request.user)
 
+    user_form = UserForm(instance=request.user)
+    profile_form = UserProfileForm(instance=user_profile)
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('accounts:myprofile')
+
+    return render(request, 'accounts/myprofile.html', {'user_form': user_form, 'profile_form': profile_form})
 
 
 def forgot_password(request):

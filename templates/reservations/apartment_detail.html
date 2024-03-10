@@ -75,7 +75,7 @@
         {% if user.is_authenticated %}
         {% if apartment.user == user %}
         <div class="col-md-6">
-            <div class="h-100 p-5 bg-body-tertiary border rounded-5 text-center">
+            <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
                 <br><br><br><br>
                 <div class="alert alert-info text-center" role="alert">
                     You cannot reserve your own apartment.
@@ -85,7 +85,7 @@
         {% else %}
         <div class="col-md-6">
             <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
-                <br><br><br><br>
+                <br><br><br>
                 <h2>Check availability and reserve</h2>
                 <a href="{% url 'reservations:BookingView' pk=apartment.pk %}" class="btn btn-primary">Click and reserve</a>
             </div>
@@ -94,7 +94,10 @@
         {% else %}
         <div class="col-md-6">
             <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
-                You have to be logged in to reserve an apartment.
+                <br><br><br>
+                <div class="alert alert-info text-center" role="alert">
+                    You have to be logged in to reserve an apartment.
+                </div>
             </div>
         </div>
         {% endif %}

@@ -124,21 +124,52 @@ class AddApartmentView(View):
     def post(self, request):
         form = ApartmentForm(request.POST)
         photo_form = PhotoForm(request.POST, request.FILES)
-
+        
         if form.is_valid() and photo_form.is_valid():
             apartment = form.save(commit=False)
-            apartment.user=request.user
+            apartment.user = request.user
             apartment.save()
-            photo = photo_form.save(commit=False)
-            photo.apartment = apartment
-            photo.save()
-           
+            
+            for image in request.FILES.getlist('image'):
+                photo = Photo(apartment=apartment, image=image)
+                photo.save()
 
             check_location(apartment.pk)
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
-        return render(request, self.template_name, {'form': form, 'photo_form': photo_form})    
+        return render(request, self.template_name, {'form': form, 'photo_form': photo_form})
 
+
+
+# class EditApartmentView(View):
+#     template_name = 'reservations/edit_apartment.html'
+    
+#     def get(self, request, pk):
+#         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
+#         form = ApartmentForm(instance=apartment)
+#         photo_form = PhotoForm(instance=apartment.photos.first())
+#         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form})
+
+#     def post(self, request, pk):
+#         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
+#         form = ApartmentForm(request.POST, instance=apartment)
+#         photo_form = PhotoForm(request.POST, request.FILES)
+
+#         if form.is_valid() and photo_form.is_valid():
+#             apartment = form.save(commit=False)
+#             apartment.user = request.user
+#             apartment.save()
+
+#             photo = photo_form.save(commit=False)
+#             photo.apartment = apartment
+#             photo.save()
+
+#             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
+
+#         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form })
+
+
+from django.shortcuts import redirect
 
 class EditApartmentView(View):
     template_name = 'reservations/edit_apartment.html'
@@ -159,13 +190,21 @@ class EditApartmentView(View):
             apartment.user = request.user
             apartment.save()
 
-            photo = photo_form.save(commit=False)
-            photo.apartment = apartment
-            photo.save()
+            # Usuwanie zaznaczonych zdjęć
+            delete_photos_ids = request.POST.getlist('delete_photos')
+            for photo_id in delete_photos_ids:
+                photo = Photo.objects.get(pk=photo_id)
+                photo.delete()
+
+            # Dodawanie nowych zdjęć
+            for image in request.FILES.getlist('image'):
+                photo = Photo(apartment=apartment, image=image)
+                photo.save()
 
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form })
+
 
 
 class DeleteApartmentView(View):
