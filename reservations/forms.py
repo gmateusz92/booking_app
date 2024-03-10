@@ -18,8 +18,7 @@ class ApartmentForm(forms.ModelForm):
             'city': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
             'latitude': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
             'longitude': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
-            'location': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),
-            
+            'location': forms.NumberInput(attrs={'class': 'form-control narrow-input'}),     
         }
 
 class PhotoForm(forms.ModelForm):
@@ -77,6 +76,12 @@ class CommentForm(forms.Form):
     booking_id = forms.IntegerField(widget=forms.HiddenInput())
     comment = forms.CharField(widget=forms.Textarea)
     rating = forms.IntegerField(label='Rating (1-5)', validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+# class CommentForm(forms.ModelForm):
+#     booking_id = forms.IntegerField(widget=forms.HiddenInput())
+#     class Meta:
+#         model = Booking
+#         fields = [ 'comment', 'rating', 'booking_id']
 
 
 

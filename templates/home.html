@@ -31,8 +31,6 @@
     {% endif %}
 </div>
 
-
-
 <div class="d-flex justify-content-center align-items-center" style="height: 25vh;">
     <div>
         <h2 class="text-center mb-4" style="font-size: 2.5rem;">Search location</h2>
@@ -54,8 +52,6 @@
         </div>
     </div>
 </div>
-
-
 
 <div class="text-center mb-3">
     <form class="form-inline" method="GET" action="{% url 'reservations:home' %}">
@@ -84,7 +80,7 @@
                             <img src="" alt="Thumbnails" class="bd-placeholder-img card-img-top img-fluid">
                         {% endif %}
                         <div class="card-body">
-                            <p class="card-text">{{ apartment.name|capfirst }}</p>
+                            <h5><p class="card-text">{{ apartment.name|capfirst }}</p></h5>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="btn-group">
                                     <a href="{% url 'reservations:ApartmentDetailView' pk=apartment.pk %}" class="btn btn-sm btn-dark">View more</a>

@@ -132,6 +132,7 @@ class AddApartmentView(View):
             photo = photo_form.save(commit=False)
             photo.apartment = apartment
             photo.save()
+           
 
             check_location(apartment.pk)
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)

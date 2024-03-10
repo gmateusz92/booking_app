@@ -4,6 +4,7 @@
 <div class="container">
     <h1>{{ apartment.name|capfirst }} Details</h1>   
     <hr>
+    {% if user == apartment.user %}
     <a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-dark">Edit</a>      
     
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
@@ -30,6 +31,7 @@
     </form>
     <a href="{% url 'reservations:AddApartmentView' %}" class="btn btn-success">Add new apartment</a>
     <p class="col-md-8 fs-4"> </p>
+    {% endif %}
     <style>
         .property-info p {
             margin-bottom: 0; 
@@ -48,7 +50,7 @@
             <p><strong>Persons:</strong> {{ apartment.capacity }}</p>
             <p><strong>Price:</strong> {{ apartment.price }} $</p>
         </div>
-    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" integrity="sha512-...">
         <div class="col-md-4">
             <div class="row">
                 {% for photo in apartment.photos.all %}
@@ -60,6 +62,7 @@
                 {% endfor %}
             </div>
         </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
     </div>
     <!-- Dodanie klasy location-section do sekcji z lokalizacją -->
     <div class="row align-items-md-stretch location-section">
