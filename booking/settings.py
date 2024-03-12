@@ -72,6 +72,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'reservations.context_processors.get_google_api',
+                'accounts.context_processors.profile',
+                'reservations.context_processors.profile',
             ],
             'libraries': {
                 'apartment_tags': 'reservations.templatetags.apartment_tags',

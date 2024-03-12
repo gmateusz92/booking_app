@@ -128,28 +128,28 @@ from .models import UserProfile
 
 from django.core.exceptions import ObjectDoesNotExist
 
+# @login_required(login_url='login')
+# def my_profile(request):
+#     try:
+#         user_profile = UserProfile.objects.get(user=request.user)
+#     except ObjectDoesNotExist:
+#         user_profile = UserProfile.objects.create(user=request.user)
+
+#     user_form = UserForm(instance=request.user)
+#     profile_form = UserProfileForm(instance=user_profile)
+
+#     if request.method == 'POST':
+#         user_form = UserForm(request.POST, instance=request.user)
+#         profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+#         if user_form.is_valid() and profile_form.is_valid():
+#             user_form.save()
+#             profile_form.save()
+#             return redirect('accounts:myprofile')
+
+#     return render(request, 'accounts/myprofile.html', {'user_form': user_form, 'profile_form': profile_form})
+
 @login_required(login_url='login')
-def my_profile(request):
-    try:
-        user_profile = UserProfile.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        user_profile = UserProfile.objects.create(user=request.user)
-
-    user_form = UserForm(instance=request.user)
-    profile_form = UserProfileForm(instance=user_profile)
-
-    if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            return redirect('accounts:myprofile')
-
-    return render(request, 'accounts/myprofile.html', {'user_form': user_form, 'profile_form': profile_form})
-
-@login_required(login_url='login')
-def cprofile(request):
+def profile(request):
     profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == 'POST':
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)

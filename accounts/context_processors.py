@@ -25,3 +25,12 @@ def get_google_api(request):
 #pobiera klucz API Paypal
 def get_paypal_client_id(request):
     return {'PAYPAL_CLIENT_ID': settings.PAYPAL_CLIENT_ID}
+
+from .models import UserProfile
+
+def profile(request):
+    if request.user.is_authenticated:
+        profile = UserProfile.objects.get(user=request.user)  # Przykładowe pobranie profilu
+    else:
+        profile = None
+    return {'profile': profile}
