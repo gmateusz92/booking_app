@@ -1,5 +1,5 @@
 from django.urls import path
-from. views import registerUser, index, login, logout, my_profile, activate, forgot_password, reset_password_validate, reset_password
+from. views import registerUser, index, login, logout, my_profile, activate, forgot_password, reset_password_validate, reset_password, cprofile
 
 app_name = 'accounts'
 
@@ -18,6 +18,7 @@ urlpatterns = [
     path('reset_password_validate/<uidb64>/<token>/', reset_password_validate, name='reset_password_validate'),
     path('reset_password/', reset_password, name='reset_password'),
 
+    path('profile/', cprofile, name='cprofile'),
     # path('myAccount/', myAccount, name='myAccount'), #customer albo vender
     #ath('custDashboard/', custDashboard, name='custDashboard'),
     

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'includes/alerts.html' %}
+
+
+                   
+<h5 class="text-uppercase">Profile Settings</h5>
+
+<h1 class="text-uppercase">My Profile</h1>
+<hr>
+
+<div class="container">
+<form action="{% url 'accounts:cprofile' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if profile.profile_picture %}
+    <img class="thumbnail" src="{{profile.profile_picture.url}}" alt="Profile Picture">
+        {% else %}
+            Upload profile photo.
+        {% endif %}
+        <div class="text-holder">
+            <label>Update Profile Picture</label>
+            <div class="upload-gallery">
+                {{profile_form.profile_picture}}
+            </div>
+            <label class="text-danger">{{ profile_form.profile_picture.errors }}</label>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ user_form.first_name.label_tag }}
+                        {{ user_form.first_name }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ user_form.last_name.label_tag }}
+                        {{ user_form.last_name }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ user_form.first_name.label_tag }}
+                        {{ user_form.first_name }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ user_form.last_name.label_tag }}
+                        {{ user_form.last_name }}
+                    </div>
+                </div>    
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ user_form.first_name.label_tag }}
+                        {{ user_form.first_name }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ user_form.last_name.label_tag }}
+                        {{ user_form.last_name }}
+                    </div>
+                </div>
+
+
+                        <div class="field-holder">
+                            <label>First Name*</label>
+                            {{ user_form.first_name }}
+                        </div>
+                    
+                    
+                        <div class="field-holder">
+                            <label>Last Name</label>
+                            {{ user_form.last_name }}
+                        </div>
+                    
+                    
+                        <div class="field-holder">
+                            <label>Phone Number</label>
+                            {{ user_form.phone_number.label_tag }}
+                            {{ user_form.phone_number }}
+                        </div>
+                    
+                    
+                        <div class="field-holder">
+                            <label>Address </label>
+                            {{profile_form.address}}
+                            <small class="text-muted float-right">powered by Google</small>
+                        </div>
+                    
+                    
+                        <div class="field-holder">
+                            <label>Country </label>
+                            {{profile_form.country}}
+                        </div>
+                    
+                    
+                        <div class="field-holder">
+                            <label>State </label>
+                            {{profile_form.state}}
+                        </div>
+                    
+                    
+                        <div class="field-holder">
+                            <label>City </label>
+                            {{profile_form.city}}
+                        </div>
+                    
+                        <div class="field-holder">
+                            <label>Pin Code </label>
+                            {{profile_form.pin_code}}
+                        </div>
+                    
+            
+            </div>
+        </div>
+        <div class="field-holder">
+            <div class="payment-holder input-button-loader">
+                <input type="submit" value="Update Profile">
+            </div>
+        </div>
+    </div>
+</form>
+
+
+  
+
+{% endblock %}

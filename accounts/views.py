@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import UserForm, UserProfileForm, AuthenticationForm
+from .forms import UserForm, UserProfileForm, AuthenticationForm, UserInfoForm
 from .models import User, UserProfile
 from django.contrib import messages, auth
 from accounts.utils import send_verification_email #send_password_reset_email
@@ -9,7 +9,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import PermissionDenied
 from django.template.defaultfilters import slugify
 from django.contrib.auth import login, authenticate
-
+from django.shortcuts import render, get_object_or_404
 
 def index(request):
     return render(request, 'index.html')
@@ -147,6 +147,34 @@ def my_profile(request):
             return redirect('accounts:myprofile')
 
     return render(request, 'accounts/myprofile.html', {'user_form': user_form, 'profile_form': profile_form})
+
+@login_required(login_url='login')
+def cprofile(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if request.method == 'POST':
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        user_form = UserInfoForm(request.POST, instance=request.user)
+        if profile_form.is_valid() and user_form.is_valid():
+            profile_form.save()
+            user_form.save()
+            messages.success(request, 'Profile updated')
+            return redirect('accounts:cprofile')
+        else:
+            print(profile_form.errors)
+            print(user_form.errors)
+    else:
+        profile_form = UserProfileForm(instance=profile)
+        user_form = UserInfoForm(instance=request.user) #instance "pobiera dane" i wkleja w formularz np imie
+
+    context = {
+        'profile_form': profile_form,
+        'user_form': user_form,
+        'profile': profile,
+    }
+
+    return render(request, 'reservations/cprofile.html', context)
+
+
 
 
 def forgot_password(request):
