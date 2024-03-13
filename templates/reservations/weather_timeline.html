@@ -13,7 +13,18 @@
 </body>
 </html>
 
-
+<div class="container">
+    <h2 class="text-center mb-4" style="font-size: 2.5rem;">Check the weather forecast</h2>
+    <div class="d-flex justify-content-center">
+        <form class="form-inline" method="GET" action="">
+            {% csrf_token %}
+            <div class="input-group">
+                <input id="id_address" name="q" class="form-control" style="max-width: 350px;" type="search" placeholder="Start typing city..." aria-label="Search" value="{{ request.GET.q }}">
+                <button class="btn btn-dark" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 
 <div class="page-content page-container" id="page-content">
@@ -67,42 +78,7 @@
 </div>
 
 
-<section class="vh-100">
-    <div class="container py-3 h-10"> 
-        <div class="row d-flex justify-content-center align-items-center h-10 no-gutters">
-            <div class="col-md-8 col-lg-8 col-xl-4">   
-                <h3 class="mb-4 pb-2 fw-normal">Check the weather forecast</h3>  
-                <!-- Formularz wyszukiwania miasta -->
-                <div class="input-group rounded mb-3">
-                    <input type="search" class="form-control rounded" placeholder="City" aria-label="Search"
-                        aria-describedby="search-addon" />
-                    <a href="#!" type="button">
-                        <span class="input-group-text border-0 fw-bold" id="search-addon">
-                            Check!
-                        </span>
-                    </a>
-                </div>    
-            </div>    
-        </div>
-    </div>
-</section>
 
-<h1>Weather Timeline</h1>
-<div id="weather-data">
-    <ul>
-        <!-- Wyświetlanie danych o pogodzie -->
-        {% for day in weather_data %}
-            <li>
-                <strong>Date:</strong> {{ day.date }}, 
-                <strong>Max Temp:</strong> {{ day.temp_max }}, 
-                <strong>Min Temp:</strong> {{ day.temp_min }}, 
-                <strong>Description:</strong> {{ day.description }}
-                 snowdepth: {{ day.snowdepth }}
-            </li>
-        {% endfor %}
-        {{ city_name }}
-    </ul>
-</div>
 
 
 <style>

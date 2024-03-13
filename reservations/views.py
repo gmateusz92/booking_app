@@ -574,63 +574,127 @@ import requests
 from datetime import datetime
 from django.shortcuts import render, redirect
 
-def weather_timeline(request):
-    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Warszawa?unitGroup=metric&key=Z9WKQT48NZFKQSPCRKQCQX454&contentType=json"
-    response = requests.get(url)
+# def weather_timeline(request):
+#     url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}?unitGroup=metric&key=Z9WKQT48NZFKQSPCRKQCQX454&contentType=json"
+#     response = requests.get(url)
     
-    if response.status_code == 200:
-        data = response.json()
-        city_name = data.get('resolvedAddress', '')
-        date = data.get('days', [{}])[0].get('datetime', '')
-        temp = data.get('days', [{}])[0].get('temp', '')
-        feelslike = data.get('days', [{}])[0].get('feelslike', '')
+#     if response.status_code == 200:
+#         data = response.json()
+#         city_name = data.get('resolvedAddress', '')
+#         date = data.get('days', [{}])[0].get('datetime', '')
+#         temp = data.get('days', [{}])[0].get('temp', '')
+#         feelslike = data.get('days', [{}])[0].get('feelslike', '')
 
-        # Konwersja daty na format datetime
-        date_formatted = datetime.strptime(date, '%Y-%m-%d')
+#         # Konwersja daty na format datetime
+#         date_formatted = datetime.strptime(date, '%Y-%m-%d')
         
-        # Formatowanie daty w żądany sposób
-        date = date_formatted.strftime('%d.%m.%Y')
+#         # Formatowanie daty w żądany sposób
+#         date = date_formatted.strftime('%d.%m.%Y')
         
-        # Określenie nazwy dnia tygodnia
-        weekday = date_formatted.strftime('%A')
+#         # Określenie nazwy dnia tygodnia
+#         weekday = date_formatted.strftime('%A')
 
-        weather_data = []
-        for day in data["days"]:
-            weather_description = day["description"].lower()
-            icon_class = ""
-            weather_condition = ""
+#         weather_data = []
+#         for day in data["days"]:
+#             weather_description = day["description"].lower()
+#             icon_class = ""
+#             weather_condition = ""
 
-            if "partly cloudy" in weather_description:
-                icon_class = "fas fa-cloud-sun"
-                weather_condition = "Partly cloudy"
-            elif "cloudy" in weather_description:
-                icon_class = "fas fa-cloud"
-                weather_condition = "Cloudy"
-            elif "clear" in weather_description:
-                icon_class = "fas fa-sun"
-                weather_condition = "Clear"
-            elif "rain" in weather_description:
-                icon_class = "fas fa-cloud-showers-heavy"
-                weather_condition = "Rain"
-            else:
-                icon_class = "fas fa-question"
-                weather_condition = "Unknown"
+#             if "partly cloudy" in weather_description:
+#                 icon_class = "fas fa-cloud-sun"
+#                 weather_condition = "Partly cloudy"
+#             elif "cloudy" in weather_description:
+#                 icon_class = "fas fa-cloud"
+#                 weather_condition = "Cloudy"
+#             elif "clear" in weather_description:
+#                 icon_class = "fas fa-sun"
+#                 weather_condition = "Clear"
+#             elif "rain" in weather_description:
+#                 icon_class = "fas fa-cloud-showers-heavy"
+#                 weather_condition = "Rain"
+#             else:
+#                 icon_class = "fas fa-question"
+#                 weather_condition = "Unknown"
 
-            weather_day = {
-                "humidity": day['humidity'],
-                "date": day["datetime"],
-                "temp_max": day["tempmax"],
-                "temp_min": day["tempmin"],
-                "snowdepth": day["snowdepth"],
-                "description": day["description"],
-                "icon_class": icon_class,
-                "weather_condition": weather_condition,
-            }
-            weather_data.append(weather_day)
+#             weather_day = {
+#                 "humidity": day['humidity'],
+#                 "date": day["datetime"],
+#                 "temp_max": day["tempmax"],
+#                 "temp_min": day["tempmin"],
+#                 "snowdepth": day["snowdepth"],
+#                 "description": day["description"],
+#                 "icon_class": icon_class,
+#                 "weather_condition": weather_condition,
+#             }
+#             weather_data.append(weather_day)
         
-        return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data, 'city_name': city_name, 'date': date, 'weekday': weekday, 'temp':temp, 'feelslike': feelslike})
+#         return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data, 'city_name': city_name, 'date': date, 'weekday': weekday, 'temp':temp, 'feelslike': feelslike})
+#     else:
+#         error_message = "Błąd podczas pobierania danych pogodowych"
+#         return redirect('reservations:home')
+
+
+from django.shortcuts import redirect
+
+def weather_timeline(request):
+    if request.method == 'GET' and 'q' in request.GET:
+        city_name = request.GET.get('q')
+        url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city_name}?unitGroup=metric&key=Z9WKQT48NZFKQSPCRKQCQX454&contentType=json"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            data = response.json()
+            city_name = data.get('resolvedAddress', '')
+            date = data.get('days', [{}])[0].get('datetime', '')
+            temp = data.get('days', [{}])[0].get('temp', '')
+            feelslike = data.get('days', [{}])[0].get('feelslike', '')
+
+            # Konwersja daty na format datetime
+            date_formatted = datetime.strptime(date, '%Y-%m-%d')
+            
+            # Formatowanie daty w żądany sposób
+            date = date_formatted.strftime('%d.%m.%Y')
+            
+            # Określenie nazwy dnia tygodnia
+            weekday = date_formatted.strftime('%A')
+
+            weather_data = []
+            for day in data["days"]:
+                weather_description = day["description"].lower()
+                icon_class = ""
+                weather_condition = ""
+
+                if "partly cloudy" in weather_description:
+                    icon_class = "fas fa-cloud-sun"
+                    weather_condition = "Partly cloudy"
+                elif "cloudy" in weather_description:
+                    icon_class = "fas fa-cloud"
+                    weather_condition = "Cloudy"
+                elif "clear" in weather_description:
+                    icon_class = "fas fa-sun"
+                    weather_condition = "Clear"
+                elif "rain" in weather_description:
+                    icon_class = "fas fa-cloud-showers-heavy"
+                    weather_condition = "Rain"
+                else:
+                    icon_class = "fas fa-question"
+                    weather_condition = "Unknown"
+
+                weather_day = {
+                    "humidity": day['humidity'],
+                    "date": day["datetime"],
+                    "temp_max": day["tempmax"],
+                    "temp_min": day["tempmin"],
+                    "snowdepth": day["snowdepth"],
+                    "description": day["description"],
+                    "icon_class": icon_class,
+                    "weather_condition": weather_condition,
+                }
+                weather_data.append(weather_day)
+            
+            return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data, 'city_name': city_name, 'date': date, 'weekday': weekday, 'temp':temp, 'feelslike': feelslike})
+        else:
+            error_message = "Błąd podczas pobierania danych pogodowych"
+            return redirect('reservations:weather_timeline')
     else:
-        error_message = "Błąd podczas pobierania danych pogodowych"
-        return redirect('reservations:home')
-
-
+        return render(request, 'reservations/weather_timeline.html')
