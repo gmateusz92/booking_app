@@ -10,23 +10,23 @@
 </style>
 
 
-<div class="container">
+<div class="container mt-5">
     <h1>Booking History</h1>
     <hr>
     {% if bookings %}
     <ul class="list-group">
         {% for booking in bookings %}
-        <li class="list-group-item bg-dark">
+        <li class="list-group-item bg-light">
             <div class="row ">
                 <div class="col-md-8">
                     <br>
                     <div class="d-flex align-items-center">
                         {% if booking.name.photos.first %}
-                            <img src="{{ booking.name.photos.first.image.url }}" alt="Apartment Photo" class="img-thumbnail me-3" style="width: 100px;">
+                            <img src="{{ booking.name.photos.first.image.url }}" alt="Apartment Photo" class="img-fluid rounded me-3" style="max-width: 200px; height: auto;">
                         {% endif %}
-                        <h4 class="text-white fw-bold mb-0">
+                        <h6 class="text-dark fw-bold mb-0">
                             Reservation {{ booking.name.name|capfirst }} from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}.
-                        </h4>
+                        </h6>
                     </div>
                     <br>
                 </div>
@@ -58,7 +58,7 @@
                         </div>
                         <div class="mb-3">
                             <input type="hidden" name="booking_id" value="{{ booking.id }}">
-                            <button type="submit" class="btn btn-light">Add Opinion and Rate</button>
+                            <button type="submit" class="btn btn-secondary">Add Opinion and Rate</button>
                         </div>
                     </form>
                     {% else %}

@@ -20,6 +20,7 @@ from datetime import date
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from datetime import datetime
+from accounts.models import UserProfile
 
 def home(request):
     query = request.GET.get('q', '')
@@ -237,6 +238,7 @@ def vendor_booking_list(request):
     user = request.user
     current_date = date.today()
     user_apartments = Apartment.objects.filter(user=user)
+    
  
     owner_bookings = []
     for apartment in user_apartments:
@@ -396,6 +398,10 @@ def message_view(request, booking_id):
             send_mail(subject, '', None, [apartment.user.email], html_message=html_message)
 
     messages = Message.objects.filter(booking=booking)
+
+    for message in messages:
+        message.sender_profile = UserProfile.objects.get(user=message.sender)
+
     return render(request, 'reservations/message.html', {'booking': booking, 'apartment': apartment, 'messages': messages})
 
 

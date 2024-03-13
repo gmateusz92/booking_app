@@ -5,19 +5,20 @@
 {% include 'includes/alerts.html' %}
 
                    
-
-<h1 class="text-uppercase">Profile Settings</h1>
+<div class="container mt-5">
+<h1>Profile Settings</h1>
 <hr>
+<div class="h-100 p-3 text-bg-light rounded-3">
 <div class="container">
 <form action="{% url 'accounts:profile' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% if profile.profile_picture %}
     <img class="thumbnail" src="{{profile.profile_picture.url}}" alt="Profile Picture">
         {% else %}
-            Upload profile photo.
+            Upload Profile Photo.
         {% endif %}
         <div class="text-holder">
-            <label>Update Profile Picture</label>
+            
             <div class="upload-gallery">
                 {{profile_form.profile_picture}}
             </div>
@@ -64,9 +65,9 @@
                     {{ profile_form.state }}
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Save Changes</button>    
-            
+                <button type="submit" class="btn btn-secondary mt-3">Save Changes</button>    
             </div>
+        </div>    
     </div>
 </form>
 

@@ -38,7 +38,7 @@
             {% csrf_token %}
             <div class="input-group">
                 <input id="id_address" name="q" class="form-control" style="max-width: 350px;" type="search" placeholder="Start typing city..." aria-label="Search" value="{{ request.GET.q }}">
-                <button class="btn btn-dark" type="submit">Search</button>
+                <button class="btn btn-secondary" type="submit">Search</button>
             </div>
         </form>
         <br>
@@ -60,7 +60,7 @@
             <option value="asc">Lowest to Highest</option>
             <option value="desc">Highest to Lowest</option>
         </select>
-        <button class="btn btn-dark my-2 my-sm-0" type="submit">Apply</button>
+        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Apply</button>
     </form>
 </div>
 
@@ -83,9 +83,9 @@
                             <h5><p class="card-text">{{ apartment.name|capfirst }}</p></h5>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="btn-group">
-                                    <a href="{% url 'reservations:ApartmentDetailView' pk=apartment.pk %}" class="btn btn-sm btn-dark">View more</a>
+                                    <a href="{% url 'reservations:ApartmentDetailView' pk=apartment.pk %}" class="btn btn-sm btn-secondary">View more</a>
                                     <span style="margin: 0 5px;"></span>
-                                    <a href="{% url 'reservations:read_opinions' apartment.id %}" class="btn btn-sm btn-dark">Read opinions</a>
+                                    <a href="{% url 'reservations:read_opinions' apartment.id %}" class="btn btn-sm btn-secondary">Read opinions</a>
                                 </div>
                                 <small class="text-body-secondary">{{ apartment.price }} $</small>
                             </div>
