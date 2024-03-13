@@ -28,9 +28,20 @@ def get_paypal_client_id(request):
 
 from .models import UserProfile
 
+# def profile(request):
+#     if request.user.is_authenticated:
+#         profile = UserProfile.objects.get(user=request.user)  # Przykładowe pobranie profilu
+#     else:
+#         profile = None
+#     return {'profile': profile}
+
 def profile(request):
+    profile = None
     if request.user.is_authenticated:
-        profile = UserProfile.objects.get(user=request.user)  # Przykładowe pobranie profilu
-    else:
-        profile = None
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+            if not profile.profile_picture:  # Sprawdzamy, czy użytkownik ma przypisane zdjęcie profilowe
+                profile = None  # Jeśli nie, ustawiamy profile na None
+        except UserProfile.DoesNotExist:
+            pass
     return {'profile': profile}

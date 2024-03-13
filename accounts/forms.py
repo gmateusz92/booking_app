@@ -30,17 +30,17 @@ class UserForm(forms.ModelForm):
 
 
 
-class UserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'phone_number']
-        widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
-        }
+# class UserForm(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = ['first_name', 'last_name', 'username', 'email', 'phone_number']
+#         widgets = {
+#             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+#             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+#             'username': forms.TextInput(attrs={'class': 'form-control'}),
+#             'email': forms.EmailInput(attrs={'class': 'form-control'}),
+#             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+#         }
 
 class UserProfileForm(forms.ModelForm):
     # address = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Start typing...', 'required': 'required'}))

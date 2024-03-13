@@ -19,7 +19,7 @@ from django.db.models import Avg
 from datetime import date
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-
+from datetime import datetime
 
 def home(request):
     query = request.GET.get('q', '')
@@ -533,14 +533,89 @@ class DeletePreferenceView(View):
 import requests
 from django.shortcuts import render
 
+# def weather_timeline(request):
+#     url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Warszawa?unitGroup=metric&key=Z9WKQT48NZFKQSPCRKQCQX454&contentType=json"
+#     # url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Warszawa?unitGroup=metric&key=6H8CDM5GQSPVME8X2Z7RGXKNZ&contentType=json"
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         data = response.json()
+#         city_name = data.get('resolvedAddress', '')
+#         date = data.get('days', [{}])[0].get('datetime', '')
+#         temp = data.get('days', [{}])[0].get('temp', '')
+
+#         # Konwersja daty na format datetime
+#         date_formatted = datetime.strptime(date, '%Y-%m-%d')
+        
+#         # Formatowanie daty w żądany sposób
+#         date = date_formatted.strftime('%d.%m.%Y')
+        
+#         # Określenie nazwy dnia tygodnia
+#         weekday = date_formatted.strftime('%A')
+
+#         weather_data = []
+#         for day in data["days"]:
+#             weather_day = {
+#                 "humidity": day['humidity'],
+#                 "date": day["datetime"],
+#                 "temp_max": day["tempmax"],
+#                 "temp_min": day["tempmin"],
+#                 "snowdepth": day["snowdepth"],
+#                 "description": day["description"],
+#             }
+#             weather_data.append(weather_day)
+#             print('siema')
+#         return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data, 'city_name': city_name, 'date': date, 'weekday': weekday, 'temp':temp})
+#     else:
+#         error_message = "Błąd podczas pobierania danych pogodowych"
+#         return redirect('reservations:home')    
+    
+
+import requests
+from datetime import datetime
+from django.shortcuts import render, redirect
+
 def weather_timeline(request):
     url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Warszawa?unitGroup=metric&key=Z9WKQT48NZFKQSPCRKQCQX454&contentType=json"
-    # url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Warszawa?unitGroup=metric&key=6H8CDM5GQSPVME8X2Z7RGXKNZ&contentType=json"
     response = requests.get(url)
+    
     if response.status_code == 200:
         data = response.json()
+        city_name = data.get('resolvedAddress', '')
+        date = data.get('days', [{}])[0].get('datetime', '')
+        temp = data.get('days', [{}])[0].get('temp', '')
+        feelslike = data.get('days', [{}])[0].get('feelslike', '')
+
+        # Konwersja daty na format datetime
+        date_formatted = datetime.strptime(date, '%Y-%m-%d')
+        
+        # Formatowanie daty w żądany sposób
+        date = date_formatted.strftime('%d.%m.%Y')
+        
+        # Określenie nazwy dnia tygodnia
+        weekday = date_formatted.strftime('%A')
+
         weather_data = []
         for day in data["days"]:
+            weather_description = day["description"].lower()
+            icon_class = ""
+            weather_condition = ""
+
+            if "partly cloudy" in weather_description:
+                icon_class = "fas fa-cloud-sun"
+                weather_condition = "Partly cloudy"
+            elif "cloudy" in weather_description:
+                icon_class = "fas fa-cloud"
+                weather_condition = "Cloudy"
+            elif "clear" in weather_description:
+                icon_class = "fas fa-sun"
+                weather_condition = "Clear"
+            elif "rain" in weather_description:
+                icon_class = "fas fa-cloud-showers-heavy"
+                weather_condition = "Rain"
+            else:
+                icon_class = "fas fa-question"
+                weather_condition = "Unknown"
+
             weather_day = {
                 "humidity": day['humidity'],
                 "date": day["datetime"],
@@ -548,15 +623,14 @@ def weather_timeline(request):
                 "temp_min": day["tempmin"],
                 "snowdepth": day["snowdepth"],
                 "description": day["description"],
+                "icon_class": icon_class,
+                "weather_condition": weather_condition,
             }
             weather_data.append(weather_day)
-            print('siema')
-        return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data})
+        
+        return render(request, 'reservations/weather_timeline.html', {'weather_data': weather_data, 'city_name': city_name, 'date': date, 'weekday': weekday, 'temp':temp, 'feelslike': feelslike})
     else:
         error_message = "Błąd podczas pobierania danych pogodowych"
-        return redirect('reservations:home')    
-    
+        return redirect('reservations:home')
 
-import requests
-from django.shortcuts import render
 

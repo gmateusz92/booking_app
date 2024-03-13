@@ -158,7 +158,7 @@ def profile(request):
             profile_form.save()
             user_form.save()
             messages.success(request, 'Profile updated')
-            return redirect('accounts:cprofile')
+            return redirect('accounts:profile')
         else:
             print(profile_form.errors)
             print(user_form.errors)
