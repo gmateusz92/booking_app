@@ -164,15 +164,27 @@ GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'venv\Lib\site-packages\osgeo\gdal304
 
 #GOOGLE_API_KEY = 'AIzaSyAGkOJWRwEPRCvzAeesItLtu6z4lRrwCgs'
 
-GOOGLE_API_KEY = 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc' #trzeba stworzyc funkcje przekazujacą api key do base html ladowanie scriptu w context processors
+# GOOGLE_API_KEY = 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc' #trzeba stworzyc funkcje przekazujacą api key do base html ladowanie scriptu w context processors
 GOOGLE_MAPS_API_KEY = 'AIzaSyDpgf2CtlTEoJaQWnxVWi1KMwo7zb2APqc'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT='587'
-EMAIL_HOST_USER = 'gmateusz92@gmail.com'
-EMAIL_HOST_PASSWORD = 'kdsm kvrg wwcu wauq'
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'BookingApp <gmateusz92@gmail.com>'
+GOOGLE_API_KEY = 'AIzaSyC89hqqccDY_bJ9ofAz3lj1PEAz_z5MBro'
+
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT='587'
+# EMAIL_HOST_USER = 'gmateusz92@gmail.com'
+# EMAIL_HOST_PASSWORD = 'kdsm kvrg wwcu wauq'
+# EMAIL_USE_TLS = True
+# DEFAULT_FROM_EMAIL = 'BookingApp <gmateusz92@gmail.com>'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+
+# naza wecf hmht ipqt
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT='587'
+EMAIL_HOST_USER = 'vacahome0@gmail.com'
+EMAIL_HOST_PASSWORD = 'naza wecf hmht ipqt'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'Vacahome <vacahome0@gmail.com>'

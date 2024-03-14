@@ -1,16 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notification Email</title>
-</head>
-<body>
-    <h2>Nowy apartament w pobliżu</h2>
-    <p>Nowy apartament o nazwie <strong>{{ apartment.name }}</strong> został dodany w pobliżu Twojej lokalizacji.</p>
-    <p>Odległość: <strong>{{ distance }}</strong> kilometrów</p>
-    <p>Więcej szczegółów na stronie: <a href="">Link</a></p>
-    <p>Pozdrawiamy,<br>
-    Zespół Twojej aplikacji</p>
-</body>
-</html>
+Hi {{user.first_name}},
+
+Nowy apartament o nazwie {{ apartment.name }} został dodany w pobliżu wybranej lokalizacji
+Więcej szczegółów na stronie: 
+{{ apartment.get_absolute_url }}
+
+
+
+

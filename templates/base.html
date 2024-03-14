@@ -41,8 +41,9 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
+                
                       <li class="nav-item dropdown">
-                        {% if user|if_user_offer_apartment %} 
+                        
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                           {% if profile.profile_picture %}
                                   <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" style="max-height: 30px; max-width: 30px; border-radius: 50%;">
@@ -50,7 +51,7 @@
                               {% endif %}
                               {{ user.email }}
                         </a>
-                        {% endif %} 
+                         
                         <ul class="dropdown-menu">
                           <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">My Profile</a></li>
                           <li><a class="dropdown-item" href="{% url 'reservations:AddNotificationPreferenceView' %}">Notifictaion Preferences</a></li>

@@ -22,13 +22,27 @@ def get_google_api(request):
 
 
 
+# def profile(request):
+#     profile = None
+#     if request.user.is_authenticated:
+#         try:
+#             profile = UserProfile.objects.get(user=request.user)
+#             if not profile.profile_picture: 
+#                 profile = None  
+#         except UserProfile.DoesNotExist:
+#             pass
+#     return {'profile': profile}
+
+from django.contrib.auth.models import User
+from .models import UserProfile
+
 def profile(request):
-    profile = None
-    if request.user.is_authenticated:
+    user = request.user
+    if user.is_authenticated:
         try:
-            profile = UserProfile.objects.get(user=request.user)
-            if not profile.profile_picture: 
-                profile = None  
+            profile = UserProfile.objects.get(user=user)
         except UserProfile.DoesNotExist:
-            pass
-    return {'profile': profile}
+            profile = UserProfile.objects.create(user=user)
+        return {'profile': profile}
+    else:
+        return {}
