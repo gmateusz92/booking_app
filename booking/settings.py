@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'reservations',
     'accounts',
+    'weather',
     'vendor',
     'django.contrib.gis',
     'django_google_maps',

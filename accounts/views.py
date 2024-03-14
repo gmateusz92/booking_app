@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import UserForm, UserProfileForm, AuthenticationForm, UserInfoForm
+from .forms import UserForm, UserProfileForm, UserInfoForm
 from .models import User, UserProfile
 from django.contrib import messages, auth
 from accounts.utils import send_verification_email #send_password_reset_email

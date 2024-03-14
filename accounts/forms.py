@@ -1,7 +1,8 @@
 from django import forms
 from .models import User, UserProfile
 from .validators import allow_only_images_validator
-from django.contrib.auth.forms import AuthenticationForm
+# from django.contrib.auth.forms import AuthenticationForm
+
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control narrow-input'})) #poniewaz nie mamy w models
@@ -15,10 +16,9 @@ class UserForm(forms.ModelForm):
             'username': forms.TextInput(attrs={'class': 'form-control narrow-input'}),
             'email': forms.EmailInput(attrs={'class': 'form-control narrow-input'}),
         }
-
-    #non field error
-    def clean(self): #nadpisanie metody cleand_data zeby sprawdzic czy pass = confirm pass
-        cleaned_data = super(UserForm, self).clean() #super daje mozliwosc nadpisania clean(inbuild function)
+    
+    def clean(self): 
+        cleaned_data = super(UserForm, self).clean() 
         password = cleaned_data.get('password')
         confirm_password = cleaned_data.get('confirm_password')
 
@@ -28,27 +28,11 @@ class UserForm(forms.ModelForm):
             )
         
 
-
-
-# class UserForm(forms.ModelForm):
-#     class Meta:
-#         model = User
-#         fields = ['first_name', 'last_name', 'username', 'email', 'phone_number']
-#         widgets = {
-#             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-#             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-#             'username': forms.TextInput(attrs={'class': 'form-control'}),
-#             'email': forms.EmailInput(attrs={'class': 'form-control'}),
-#             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
-#         }
-
 class UserProfileForm(forms.ModelForm):
-    # address = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Start typing...', 'required': 'required'}))
     profile_picture = forms.FileField(widget=forms.FileInput(attrs={'class': 'btn btn-info'}), validators = [allow_only_images_validator])
    
     class Meta:
         model = UserProfile
-        # fields = ['profile_picture',  'address', 'country', 'state', 'city', 'pin_code'] #'latitude', 'longitude']
         fields = [ 'profile_picture', 'address', 'country', 'state', 'city', 'pin_code']
         widgets = {
             'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Start typing...', 'required': 'required'}),
@@ -56,10 +40,8 @@ class UserProfileForm(forms.ModelForm):
             'state': forms.TextInput(attrs={'class': 'form-control'}),
             'city': forms.TextInput(attrs={'class': 'form-control'}),
             'pin_code': forms.TextInput(attrs={'class': 'form-control'}),
-
         }
 
-    # bardzo przydatne
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
         for field in self.fields:

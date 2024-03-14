@@ -1,17 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.fields.related import OneToOneField
-from django.contrib.gis.db import models as gismodels
-from django.contrib.gis.geos import Point
-from django.contrib.gis.geos import Point
-from django.contrib.gis.db import models as gismodels
-from django_google_maps import fields as map_fields
+# from django.contrib.gis.db import models as gismodels
+# from django.contrib.gis.geos import Point
+# from django.contrib.gis.geos import Point
+# from django.contrib.gis.db import models as gismodels
+# from django_google_maps import fields as map_fields
 
 
-
-#baseusermanager pozwala edytowac dane przy tworzeniu uzytkownikow
-
-# Create your models here.
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
         if not email:
@@ -21,18 +17,18 @@ class UserManager(BaseUserManager):
             raise ValueError('User must have an username')
 
         user = self.model(
-            email = self.normalize_email(email), # jezeli wpiszesz z duzych liter zmieni na male literki
+            email = self.normalize_email(email), 
             username = username,
             first_name = first_name,
             last_name = last_name,
         )
-        user.set_password(password) #set_password ustawia haslo i przechowuje w bazie danych
-        user.save(using=self._db) #zapisuje w domyslnej bazie danych ustawionej w settings
+        user.set_password(password) 
+        user.save(using=self._db) 
         return user
 
     def create_superuser(self, first_name, last_name, username, email, password=None):
-        user = self.create_user( #tworzymy na podstawie zwyklego(create_user) i nadamy uprawnienia
-            email = self.normalize_email(email), # jezeli wpiszesz z duzych liter zmieni na male literki
+        user = self.create_user( 
+            email = self.normalize_email(email), 
             username = username,
             password = password,
             first_name = first_name,
@@ -46,7 +42,6 @@ class UserManager(BaseUserManager):
         return user
 
  
-
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -77,8 +72,6 @@ class User(AbstractBaseUser):
         return True
 
      
-
-
 class UserProfile(models.Model):
     user = OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='static/profile_pictures/', blank=True, null=True)
@@ -90,14 +83,7 @@ class UserProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
-
     def __str__(self):
         return self.user.email   
 
 
-    #tworzy point w admin panel
-    # def save(self, *args, **kwargs):
-    #     if self.latitude and self.longitude:
-    #         self.location = Point(float(self.longitude), float(self.latitude))
-    #         return super(UserProfile, self).save(*args, **kwargs)
-    #     return super(UserProfile, self).save(*args, **kwargs)
