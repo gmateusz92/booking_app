@@ -7,6 +7,19 @@ from django.core.mail import EmailMessage
 from django.contrib.gis.measure import Distance
 from geopy.distance import geodesic
 from django.contrib.gis.geos import Point
+import requests
+
+def get_weather_data(city):
+    api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ' 
+    url = f'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}?unitGroup=metric&key={api_key}&contentType=json'
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return None
+
+
 
 class Calendar(HTMLCalendar):
     def __init__(self, year=None, month=None, apartment=None):
@@ -51,7 +64,6 @@ def get_date(req_day):
         return datetime.today() 
 
 
-
 def check_location(pk):
     # Pobieramy nowo dodany apartament o podanym identyfikatorze (pk)
     apartment = Apartment.objects.get(pk=pk)
@@ -79,23 +91,3 @@ def check_location(pk):
     # Po zakończeniu pętli zwracamy True, żeby poinformować o pomyślnym wysłaniu powiadomienia
     return True
 
-
-import requests
-import json
-import logging
-
-logger = logging.getLogger(__name__)
-
-def get_bergfex_data():
-    url = "http://www.bergfex.at/oesterreich/schneewerte/"
-    response = requests.get(url)
-    if response.status_code == 200:
-        try:
-            data = response.json()
-            return data
-        except json.JSONDecodeError as e:
-            logger.error("Error decoding JSON: %s", e)
-            return None
-    else:
-        logger.error("Error fetching data from Bergfex API: %s", response.status_code)
-        return None

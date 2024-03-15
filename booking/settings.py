@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'reservations',
     'accounts',
     'weather',
-    'vendor',
     'django.contrib.gis',
     'django_google_maps',
     'crispy_forms',

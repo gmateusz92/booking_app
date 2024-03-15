@@ -1,21 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.fields.related import OneToOneField
-# from django.contrib.gis.db import models as gismodels
-# from django.contrib.gis.geos import Point
-# from django.contrib.gis.geos import Point
-# from django.contrib.gis.db import models as gismodels
-# from django_google_maps import fields as map_fields
-
 
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
         if not email:
             raise ValueError('User must have an email address')
-
         if not username:
             raise ValueError('User must have an username')
-
         user = self.model(
             email = self.normalize_email(email), 
             username = username,
@@ -40,7 +32,6 @@ class UserManager(BaseUserManager):
         user.is_superadmin = True
         user.save(using=self._db)
         return user
-
  
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50)
@@ -71,7 +62,6 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
-     
 class UserProfile(models.Model):
     user = OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='static/profile_pictures/', blank=True, null=True)

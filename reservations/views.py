@@ -1,27 +1,23 @@
-from django.shortcuts import render, redirect
-from .models import Apartment, Booking, Photo, Message
-from django.shortcuts import render, get_object_or_404
-from .forms import ApartmentForm, PhotoForm, BookingForm, CommentForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Apartment, Booking, Photo, Message, NotificationPreference
+from .forms import ApartmentForm, PhotoForm, BookingForm, CommentForm, NotificationPreferenceForm
 from django.views import View
-from django.db.models import Q
+from django.db.models import Q, Avg
 from datetime import date, timedelta
 from django.utils.safestring import mark_safe
 from .models import *
-from .utils import Calendar
+from .utils import Calendar, get_date, check_location, get_weather_data
 from django.views.generic import ListView
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .utils import get_date, check_location
-from accounts.utils import send_verification_email, send_notification
-from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Avg
+from accounts.utils import send_verification_email
 from datetime import date
+from django.utils.translation import gettext as _
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from datetime import datetime
 from accounts.models import UserProfile
-import requests
+
 
 def home(request):
     query = request.GET.get('q', '')
@@ -51,33 +47,14 @@ def home(request):
     elif sort_by_price == 'desc':
         apartments = apartments.order_by('-price')            
 
-    # if apartments:
-    #     first_apartment = apartments.first()
-    #     weather_data = get_weather_data(first_apartment.city)  # Tutaj przekazujesz nazwę miasta jako argument
-    # else:
-    #     weather_data = None
     weather_data = get_weather_data(query)
-    
-    
 
     context = {
         'apartments': apartments,
         'weather_data': weather_data,
-        
-
     }
     return render(request, 'home.html', context)
 
-def get_weather_data(city):
-    api_key = '6H8CDM5GQSPVME8X2Z7RGXKNZ'  # Tutaj wpisz swój klucz API
-    url = f'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}?unitGroup=metric&key={api_key}&contentType=json'
-    response = requests.get(url)
-    
-    if response.status_code == 200:
-        data = response.json()
-        return data
-    else:
-        return None
 
 class ApartmentDetailView(View):
     template_name = 'reservations/apartment_detail.html'
@@ -86,24 +63,23 @@ class ApartmentDetailView(View):
         apartment = get_object_or_404(Apartment, pk=pk)
         photo = Photo.objects.all()
         apartments = Apartment.objects.all()
+        # d = get_date(request.GET.get('day', None))
+        # year, month = d.year, d.month
+        # prev_month = date(year, month, 1) - timedelta(days=1)
+        # prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
+        # next_month = date(year, month, 28) + timedelta(days=7)
+        # next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
 
-        d = get_date(request.GET.get('day', None))
-        year, month = d.year, d.month
-        prev_month = date(year, month, 1) - timedelta(days=1)
-        prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
-        next_month = date(year, month, 28) + timedelta(days=7)
-        next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
-
-        cal = Calendar(year, month, apartment)
-        html_cal = cal.formatmonth(withyear=True)
+        # cal = Calendar(year, month, apartment)
+        # html_cal = cal.formatmonth(withyear=True)
 
         context = {
             'apartment': apartment,
             'photo': photo,
             'apartments': apartments,
-            'calendar': mark_safe(html_cal),
-            'prev_month_url': prev_month_url,
-            'next_month_url': next_month_url,
+            # 'calendar': mark_safe(html_cal),
+            # 'prev_month_url': prev_month_url,
+            # 'next_month_url': next_month_url,
         }
     
         return render(request, 'reservations/apartment_detail.html', context)
@@ -122,56 +98,21 @@ class AddApartmentView(View):
         form = ApartmentForm()
         photo_form = PhotoForm()
         return render(request, self.template_name, {'form': form, 'photo_form': photo_form})
-    
     def post(self, request):
         form = ApartmentForm(request.POST)
         photo_form = PhotoForm(request.POST, request.FILES)
-        
         if form.is_valid() and photo_form.is_valid():
             apartment = form.save(commit=False)
             apartment.user = request.user
             apartment.save()
-            
             for image in request.FILES.getlist('image'):
                 photo = Photo(apartment=apartment, image=image)
                 photo.save()
-
             check_location(apartment.pk)
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
 
         return render(request, self.template_name, {'form': form, 'photo_form': photo_form})
 
-
-
-# class EditApartmentView(View):
-#     template_name = 'reservations/edit_apartment.html'
-    
-#     def get(self, request, pk):
-#         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
-#         form = ApartmentForm(instance=apartment)
-#         photo_form = PhotoForm(instance=apartment.photos.first())
-#         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form})
-
-#     def post(self, request, pk):
-#         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
-#         form = ApartmentForm(request.POST, instance=apartment)
-#         photo_form = PhotoForm(request.POST, request.FILES)
-
-#         if form.is_valid() and photo_form.is_valid():
-#             apartment = form.save(commit=False)
-#             apartment.user = request.user
-#             apartment.save()
-
-#             photo = photo_form.save(commit=False)
-#             photo.apartment = apartment
-#             photo.save()
-
-#             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
-
-#         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form })
-
-
-from django.shortcuts import redirect
 
 class EditApartmentView(View):
     template_name = 'reservations/edit_apartment.html'
@@ -181,32 +122,25 @@ class EditApartmentView(View):
         form = ApartmentForm(instance=apartment)
         photo_form = PhotoForm(instance=apartment.photos.first())
         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form})
-
     def post(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk, user=request.user)
         form = ApartmentForm(request.POST, instance=apartment)
         photo_form = PhotoForm(request.POST, request.FILES)
-
         if form.is_valid() and photo_form.is_valid():
             apartment = form.save(commit=False)
             apartment.user = request.user
             apartment.save()
-
             # Usuwanie zaznaczonych zdjęć
             delete_photos_ids = request.POST.getlist('delete_photos')
             for photo_id in delete_photos_ids:
                 photo = Photo.objects.get(pk=photo_id)
                 photo.delete()
-
             # Dodawanie nowych zdjęć
             for image in request.FILES.getlist('image'):
                 photo = Photo(apartment=apartment, image=image)
                 photo.save()
-
             return redirect('reservations:ApartmentDetailView', pk=apartment.pk)
-
         return render(request, self.template_name, {'form': form, 'apartment': apartment, 'photo_form': photo_form })
-
 
 
 class DeleteApartmentView(View):
@@ -215,7 +149,6 @@ class DeleteApartmentView(View):
     def get(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk)
         return render(request, self.template_name, {'apartment': apartment})
-
     def post(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk)
         apartment.delete()
@@ -239,56 +172,47 @@ def vendor_booking_list(request):
     user = request.user
     current_date = date.today()
     user_apartments = Apartment.objects.filter(user=user)
-    
- 
     owner_bookings = []
     for apartment in user_apartments:
         bookings = Booking.objects.filter(name=apartment, check_in__gte=current_date)
         owner_bookings.extend(bookings)
-    
     context = {
         'bookings': owner_bookings
     }
     return render(request, 'reservations/vendor_booking_list.html', context)
 
-class CalendarView(ListView):
-    model = Booking
-    template_name = 'reservations/calendar.html'
+# class CalendarView(ListView):
+#     model = Booking
+#     template_name = 'reservations/calendar.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        d = get_date(self.request.GET.get('day', None))
-        year, month = d.year, d.month
-        prev_month = date(year, month, 1) - timedelta(days=1)
-        prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
-        next_month = date(year, month, 28) + timedelta(days=7)
-        next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
-        
-        cal = Calendar(year, month)
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         d = get_date(self.request.GET.get('day', None))
+#         year, month = d.year, d.month
+#         prev_month = date(year, month, 1) - timedelta(days=1)
+#         prev_month_url = reverse('reservations:calendar') + f'?day={prev_month.year}-{prev_month.month}'
+#         next_month = date(year, month, 28) + timedelta(days=7)
+#         next_month_url = reverse('reservations:calendar') + f'?day={next_month.year}-{next_month.month}'
+#         cal = Calendar(year, month)
+#         html_cal = cal.formatmonth(withyear=True)
+#         context['calendar'] = mark_safe(html_cal)
+#         context['prev_month_url'] = prev_month_url
+#         context['next_month_url'] = next_month_url
 
-        html_cal = cal.formatmonth(withyear=True)
-        context['calendar'] = mark_safe(html_cal)
-
-        context['prev_month_url'] = prev_month_url
-        context['next_month_url'] = next_month_url
-
-        return context
+#         return context
      
-from django.utils.translation import gettext as _
 
 class BookingView(View):
     template_name = 'reservations/reserve_apartment.html'
 
     def get(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk)
-
         d = get_date(request.GET.get('day', None))
         year, month = d.year, d.month
         prev_month = date(year, month, 1) - timedelta(days=1)
         prev_month_url = reverse('reservations:BookingView', kwargs={'pk': pk}) + f'?day={prev_month.year}-{prev_month.month}'
         next_month = date(year, month, 28) + timedelta(days=7)
         next_month_url = reverse('reservations:BookingView', kwargs={'pk': pk}) + f'?day={next_month.year}-{next_month.month}'
-
         cal = Calendar(year, month, apartment)
         html_cal = cal.formatmonth(withyear=True)
         form = BookingForm(initial={'name': apartment.id}) 
@@ -300,17 +224,14 @@ class BookingView(View):
             'next_month_url': next_month_url,
             'form': form, 
         }
-
         return render(request, self.template_name, context)
     
     def post(self, request, pk):
         apartment = get_object_or_404(Apartment, pk=pk)
         form = BookingForm(request.POST)
-
         if form.is_valid():
             check_in = form.cleaned_data['check_in']
-            check_out = form.cleaned_data['check_out']
-            
+            check_out = form.cleaned_data['check_out']      
             # Sprawdzenie, czy nowa rezerwacja nakłada się na istniejące
             overlapping_bookings = Booking.objects.filter(
                 Q(check_out__gt=check_in, check_in__lt=check_out) |  # zarezerwowany przed wyjazdem lub po zameldowaniu
@@ -327,21 +248,19 @@ class BookingView(View):
                 booking.user = request.user
                 booking.name = apartment  # przypisanie apartamentu do rezerwacji
                 booking.save()
+
                 user = apartment.user
                 mail_subject = _('You have a new reservation!')
                 email_template = 'emails/reservation_done.html'
                 send_verification_email(request, user, mail_subject, email_template)
-                return redirect('reservations:booking_list')
-            
-            
-        
+                return redirect('reservations:booking_list')  
+                 
         d = get_date(request.GET.get('day', None))
         year, month = d.year, d.month
         prev_month = date(year, month, 1) - timedelta(days=1)
         prev_month_url = reverse('reservations:BookingView', kwargs={'pk': pk}) + f'?day={prev_month.year}-{prev_month.month}'
         next_month = date(year, month, 28) + timedelta(days=7)
         next_month_url = reverse('reservations:BookingView', kwargs={'pk': pk}) + f'?day={next_month.year}-{next_month.month}'
-
         cal = Calendar(year, month, apartment)
         html_cal = cal.formatmonth(withyear=True)
 
@@ -352,7 +271,6 @@ class BookingView(View):
             'next_month_url': next_month_url,
             'form': form,
         }
-
         return render(request, self.template_name, context)
 
 
@@ -362,18 +280,13 @@ class DeleteBookingView(View):
     def get(self, request, pk):
         booking = get_object_or_404(Booking, pk=pk)
         return render(request, self.template_name, {'booking': booking})
-
     def post(self, request, pk):
         booking = get_object_or_404(Booking, pk=pk)
         booking.delete()
         if Booking.objects.filter(user=request.user).exists():
             return redirect('reservations:booking_list')
         else:
-            # Jeśli użytkownik nie ma rezerwacji, przekierowujemy na stronę główną
             return redirect('reservations:home')
-
-
-from django.db.models import Q
 
 
 @login_required
@@ -391,7 +304,7 @@ def message_view(request, booking_id):
             context = {'message': message}
             html_message = render_to_string(template, context)
             send_mail(subject, '', None, [receiver.email], html_message=html_message)
-        else:  # Użytkownik rezerwujący wysyła wiadomość
+        else:  
             subject = 'You have a new message.'
             template = 'emails/new_message.html'
             context = {'message': message}
@@ -399,12 +312,9 @@ def message_view(request, booking_id):
             send_mail(subject, '', None, [apartment.user.email], html_message=html_message)
 
     messages = Message.objects.filter(booking=booking)
-
     for message in messages:
         message.sender_profile = UserProfile.objects.get(user=message.sender)
-
     return render(request, 'reservations/message.html', {'booking': booking, 'apartment': apartment, 'messages': messages})
-
 
 
 def read_opinions(request, apartment_id):
@@ -431,84 +341,27 @@ def booking_history(request):
     return render(request, 'reservations/booking_history.html', {'bookings': bookings, 'form': form}) 
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import NotificationPreference
-from .forms import NotificationPreferenceForm
-
-# @login_required
-# def notification_preference(request):
-#     notification_pref, created = NotificationPreference.objects.get_or_create(user=request.user)
-#     if request.method == 'POST':
-#         form = NotificationPreferenceForm(request.POST, instance=notification_pref)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('reservations:notification_preference')
-#     else:
-#         form = NotificationPreferenceForm(instance=notification_pref)
-#     return render(request, 'reservations/notification_preference.html', {'form': form})
-
 class AddNotificationPreferenceView(View):
     template_name = 'reservations/notification_preference.html'
 
     def get(self, request):
         preferences = NotificationPreference.objects.filter(user=request.user)
         form = NotificationPreferenceForm()
-        return render(request, self.template_name, {'form': form, 'preferences': preferences })
-    
+        return render(request, self.template_name, {'form': form, 'preferences': preferences })   
     def post(self, request):
         form = NotificationPreferenceForm(request.POST)
-
         if form.is_valid():
             notification = form.save(commit=False)
             notification.user=request.user
             notification.save()
             return redirect('reservations:AddNotificationPreferenceView')
-
         return render(request, self.template_name, {'form': form})
-
-# class AddNotificationPreferenceView(View):
-#     template_name = 'reservations/notification_preference.html'
-
-#     def get(self, request):
-#         # Sprawdź, czy preferencje powiadomień już istnieją dla bieżącego użytkownika
-#         existing_preference = NotificationPreference.objects.filter(user=request.user).first()
-#         if existing_preference:
-#             return render(request, self.template_name, {'preferences': existing_preference })
-#         else:
-#             form = NotificationPreferenceForm()
-#             return render(request, self.template_name, {'form': form})
-    
-#     def post(self, request):
-#         form = NotificationPreferenceForm(request.POST)
-
-#         if form.is_valid():
-#             # Sprawdź, czy preferencje powiadomień już istnieją dla bieżącego użytkownika
-#             existing_preference = NotificationPreference.objects.filter(user=request.user).first()
-#             if existing_preference:
-#                 # Aktualizuj istniejące preferencje
-#                 existing_preference.address = form.cleaned_data['address']
-#                 existing_preference.radius = form.cleaned_data['radius']
-#                 existing_preference.save()
-#             else:
-#                 # Utwórz nowe preferencje
-#                 notification = form.save(commit=False)
-#                 notification.user=request.user
-#                 notification.save()
-#             return redirect('reservations:AddNotificationPreferenceView')
-
-#         return render(request, self.template_name, {'form': form})
-
-
-
-    
+   
 
 class DeletePreferenceView(View):
     def get(self, request, pk):
         preference = NotificationPreference.objects.get(pk=pk)
-        # Sprawdź, czy preferencja należy do zalogowanego użytkownika
         if preference.user == request.user:
-            # Usuń preferencję
             preference.delete()
         return redirect('reservations:AddNotificationPreferenceView')
 
