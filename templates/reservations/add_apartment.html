@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form method="post" enctype="multipart/form-data" class="my-4">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+        </div>
+        <div class="col-md-6">
+            {{ form.price.label_tag }}
+            {{ form.price }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ form.beds.label_tag }}
+            {{ form.beds }}
+        </div>
+        <div class="col-md-6">
+            {{ form.capacity.label_tag }}
+            {{ form.capacity }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ form.address.label_tag }}
+            {{ form.address }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ form.country.label_tag }}
+            {{ form.country }}
+        </div>
+        <div class="col-md-6">
+            {{ form.city.label_tag }}
+            {{ form.city }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ form.latitude.label_tag }}
+            {{ form.latitude }}
+        </div>
+        <div class="col-md-6">
+            {{ form.longitude.label_tag }}
+            {{ form.longitude }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+        </div>
+    </div>
+    <!-- Assuming you have a photo_form for handling photos -->
+    <!-- Adjust as necessary -->
+    {{ photo_form.as_p }}
+    <button type="submit" class="btn btn-dark mt-3">Add apartment</button>
+</form>
+
+{% endblock %}

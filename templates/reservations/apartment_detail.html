@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ apartment.name|capfirst }} Details</h1>   
+    <hr>
+    {% if user == apartment.user %}
+    <a href="{% url 'reservations:EditApartmentView' pk=apartment.pk %}" class="btn btn-dark">Edit</a>      
+    
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the apartment "{{ apartment.name }}"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form method="post" action="{% url 'reservations:DeleteApartmentView' pk=apartment.pk %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    <a href="{% url 'reservations:AddApartmentView' %}" class="btn btn-success">Add new apartment</a>
+    <p class="col-md-8 fs-4"> </p>
+    {% endif %}
+    <style>
+        .property-info p {
+            margin-bottom: 0; 
+        }
+        
+        .location-section {
+            margin-top: -60px; 
+        }
+    </style>
+    
+    <div class="row property-info">
+        <div class="col-md-8">
+            <img src="{{ apartment.photos.first.image.url }}" alt="{{ apartment.name }}" class="img-fluid mb-2 main-photo">
+            <p><strong>Description:</strong> {{ apartment.description }}</p>
+            <p><strong>Beds:</strong> {{ apartment.beds }}</p>
+            <p><strong>Persons:</strong> {{ apartment.capacity }}</p>
+            <p><strong>Price:</strong> {{ apartment.price }} $</p>
+        </div>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" integrity="sha512-...">
+        <div class="col-md-4">
+            <div class="row">
+                {% for photo in apartment.photos.all %}
+                <div class="col-md-4 mt-4">
+                    <a href="{{ photo.image.url }}" data-lightbox="apartment" data-title="{{ apartment.name }}">
+                        <img src="{{ photo.image.url }}" alt="{{ apartment.name }}" class="img-fluid smallerr-photo" style="width: 90%; height: 150px; object-fit: cover;">
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    </div>
+    <!-- Dodanie klasy location-section do sekcji z lokalizacją -->
+    <div class="row align-items-md-stretch location-section">
+        <div class="col-md-6">
+            <div class="h-100 p-3 text-bg-dark rounded-3">
+                <h2>Location</h2>
+                <div id="map" style="height: 250px; width: 100%;"></div>     
+            </div>
+        </div>
+        {% if user.is_authenticated %}
+        {% if apartment.user == user %}
+        <div class="col-md-6">
+            <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
+                <br><br><br><br>
+                <div class="alert alert-info text-center" role="alert">
+                    You cannot reserve your own apartment.
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-md-6">
+            <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
+                <br><br><br>
+                <h2>Check availability and reserve</h2>
+                <a href="{% url 'reservations:BookingView' pk=apartment.pk %}" class="btn btn-primary">Click and reserve</a>
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="col-md-6">
+            <div class="h-100 p-5 bg-body-tertiary border rounded-3 text-center">
+                <br><br><br>
+                <div class="alert alert-info text-center" role="alert">
+                    You have to be logged in to reserve an apartment.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+<script>
+    $(document).ready(function () {
+        lightbox.option({
+            'resizeDuration': 200,
+            'wrapAround': true
+        });
+    });
+    function initMap() {
+        var apartmentLatLng = {lat: {{ apartment.latitude }}, lng: {{ apartment.longitude }}};
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: apartmentLatLng,
+            zoom: 11
+        });
+        var marker = new google.maps.Marker({
+            position: apartmentLatLng,
+            map: map,
+            title: '{{ apartment.name }}'
+        });
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&callback=initMap" async defer></script>
+
+
+
+
+
+{% endblock %}
+
+

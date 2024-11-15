@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data</title>
+    
+</head>
+<body>
+    <h1>Weather Data</h1>
+    <ul>
+        {% for day in weather_data %}
+            <li>
+                <strong>Date:</strong> {{ day.date }}, 
+                <strong>Max Temp:</strong> {{ day.temp_max }}, 
+                <strong>Min Temp:</strong> {{ day.temp_min }}, 
+                <strong>Description:</strong> {{ day.description }},
+                <strong>Snow Depth:</strong> {{ day.snowdepth }}
+            </li>
+        {% endfor %}
+    </ul>
+    <div id="weather-data">
+        <!-- Tutaj zostanie umieszczona informacja o pogodzie -->
+    </div>
+
+    <script>
+        // Pobieranie danych o pogodzie po załadowaniu strony
+        window.onload = function() {
+            // Pobierz lokalizację użytkownika
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    console.log("Latitude:", latitude);
+                    console.log("Longitude:", longitude);
+                    // Wyślij współrzędne do widoku Django
+                    fetch(`/weather/?latitude=${latitude}&longitude=${longitude}`)
+                    .then(response => {
+                        console.log("Response status:", response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Wyświetl informacje o pogodzie na stronie
+                        console.log("Weather data:", data);
+                        var weatherDataDiv = document.getElementById('weather-data');
+                        weatherDataDiv.innerHTML = `
+                            <p>Location: ${data.resolvedAddress}</p>
+                            <p>Timezone: ${data.timezone}</p>
+                            <p>Description: ${data.description}</p>
+                            <!-- Dodaj więcej pól w zależności od potrzeb -->
+                        `;
+                    })
+                    .catch(error => console.error('Error fetching weather data:', error));
+                });
+            } else {
+                console.log('Geolocation is not supported by this browser.');
+            }
+        };
+    </script>
+</body>

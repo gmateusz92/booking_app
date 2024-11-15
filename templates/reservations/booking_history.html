@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load widget_tweaks %}
+
+<style>
+    .custom-form .mb-3 {
+        margin-bottom: 50px; /* Dostosuj tę wartość według preferencji */
+    }
+</style>
+
+
+<div class="container mt-5">
+    <h1>Booking History</h1>
+    <hr>
+    {% if bookings %}
+    <ul class="list-group">
+        {% for booking in bookings %}
+        <li class="list-group-item bg-light">
+            <div class="row ">
+                <div class="col-md-8">
+                    <br>
+                    <div class="d-flex align-items-center">
+                        {% if booking.name.photos.first %}
+                            <img src="{{ booking.name.photos.first.image.url }}" alt="Apartment Photo" class="img-fluid rounded me-3" style="max-width: 200px; height: auto;">
+                        {% endif %}
+                        <h6 class="text-dark fw-bold mb-0">
+                            Reservation {{ booking.name.name|capfirst }} from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}.
+                        </h6>
+                    </div>
+                    <br>
+                </div>
+                <div class="col-md-4">
+                    {% if not booking.comment %}    
+                    <form method="post" class="custom-form">
+                        {% csrf_token %}
+                        <div>
+                            {{ form.comment.label_tag }}
+                            {{ form.comment|add_class:"form-control" }} 
+                            {% if form.comment.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.comment.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.rating.label_tag }}
+                            <input type="number" name="rating" id="id_rating" class="form-control" min="1" max="5" placeholder="Rating (1-5)">
+                            {% if form.rating.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.rating.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                            <button type="submit" class="btn btn-secondary">Add Opinion and Rate</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <p><strong>Opinion:</strong> {{ booking.comment }}</p>
+                    <p><strong>Rate:</strong> {{ booking.rating }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-info text-center" role="alert">
+        There are no bookings in the history.
+    </div>
+    {% endif %}
+</div>
+
+
+
+{% endblock %}

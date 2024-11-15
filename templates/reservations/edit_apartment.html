@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+
+</style>
+<div class="container">
+    <h1>Edit Your Offer</h1>
+    <hr>
+    {% if user == apartment.user %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Pierwsza kolumna formularza ApartmentForm -->
+                <div class="mb-1">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                </div>
+                <div class="mb-1">
+                    {{ form.price.label_tag }}
+                    {{ form.price }}
+                </div>
+                <div class="mb-1">
+                    {{ form.beds.label_tag }}
+                    {{ form.beds }}
+                </div>
+                <div class="mb-1">
+                    {{ form.capacity.label_tag }}
+                    {{ form.capacity }}
+                </div>
+                <div class="mb-1">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <!-- Druga kolumna formularza ApartmentForm -->
+                <div class="mb-1">
+                    {{ form.address.label_tag }}
+                    {{ form.address }}
+                </div>
+                <div class="mb-1">
+                    {{ form.country.label_tag }}
+                    {{ form.country }}
+                </div>
+                <div class="mb-1">
+                    {{ form.city.label_tag }}
+                    {{ form.city }}
+                </div>
+                <div class="mb-1">
+                    {{ form.latitude.label_tag }}
+                    {{ form.latitude }}
+                </div>
+                <div class="mb-1">
+                    {{ form.longitude.label_tag }}
+                    {{ form.longitude }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Zdjęcia do usunięcia -->
+        
+        
+            {% for photo in apartment.photos.all %}
+            <label>
+                <input type="checkbox" name="delete_photos" value="{{ photo.id }}">
+                <img src="{{ photo.image.url }}" alt="Photo" class="img-thumbnail" style="width: 200px; height: 200px;">
+            </label>              
+            {% endfor %}
+        
+
+        <!-- Dodawanie nowych zdjęć -->
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <!-- Pierwsza kolumna formularza PhotoForm -->
+                <div class="mb-3">
+                    {{ photo_form.image.label_tag }}
+                    {{ photo_form.image }}
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-dark mt-3">Update</button>
+    </form>
+    {% else %}
+    <!-- Informacja dla użytkownika, że nie ma dostępu do edycji -->
+    <p class="text-center">Nie masz uprawnień do edycji tej oferty.</p>
+    {% endif %}
+</div>
+{% endblock %}

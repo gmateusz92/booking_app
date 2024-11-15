@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="text-center mb-3" style="font-size: 40px;">Search location</h2>
+<form class="form-inline" method="get" action="">
+    <input id="searchLocation" name="searchLocation" class="form-control mr-sm-2" style="width: 350px;" type="search" placeholder="Search" aria-label="Search" value="{{ query }}">
+    <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+</form>
+
+<!-- Wyświetl wyniki wyszukiwania -->
+{% if apartments %}
+    <h3>Search Results</h3>
+    <ul>
+        {% for apartment in apartments %}
+            <li>{{ apartment.name }} - {{ apartment.country }}, {{ apartment.city }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No results found.</p>
+{% endif %}
+
+{% endblock %}

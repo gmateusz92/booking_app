@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+   .right-align {
+    text-align: right;
+}
+
+.city-name {
+    display: inline-block;
+}
+
+.max-temp p {
+    text-align: right;
+}
+</style>
+<style>
+    .right-align p {
+        margin-bottom: 1px; /* Dostosuj wartość marginesu według potrzeb */
+    }
+</style>
+
+<div class="right-align">
+    {% if weather_data %}
+        <h4>Weather in <span class="city-name">{{weather_data.address}}</span></h4>
+        <div class="max-temp">
+            <p>Temperature: {{ weather_data.currentConditions.temp }}°C</p>
+            <p>{{ weather_data.days.0.conditions }}</p>
+            <!-- Add more fields as needed -->
+        </div>
+    {% endif %}
+</div>
+
+<div class="d-flex justify-content-center align-items-center" style="height: 25vh;">
+    <div>
+        <h2 class="text-center mb-4" style="font-size: 2.5rem;">Search location</h2>
+        <form class="form-inline justify-content-center" method="GET" action="{% url 'reservations:home' %}">
+            {% csrf_token %}
+            <div class="input-group">
+                <input id="id_address" name="q" class="form-control" style="max-width: 350px;" type="search" placeholder="Start typing city..." aria-label="Search" value="{{ request.GET.q }}">
+                <button class="btn btn-secondary" type="submit">Search</button>
+            </div>
+        </form>
+        <br>
+        <div class="text-center">
+            {% if request.user.is_authenticated %}
+                <h2 style="font-size: 1.5rem;">... or add your offer.</h2>
+                <a href="{% url 'reservations:AddApartmentView' %}" class="btn btn-dark mt-3">Click to add</a>
+            {% else %}
+                <h2 style="font-size: 1.5rem;">Login to add offer</h2>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="text-center mb-3">
+    <form class="form-inline" method="GET" action="{% url 'reservations:home' %}">
+        {% csrf_token %}
+        <select name="sort_by_price" class="form-select mr-sm-2" style="width: 150px;">
+            <option value="asc">Lowest to Highest</option>
+            <option value="desc">Highest to Lowest</option>
+        </select>
+        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Apply</button>
+    </form>
+</div>
+
+<br>
+<br>
+
+<div class="album py-5 bg-body-tertiary" style="margin-top: -100px;">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% for apartment in apartments %}
+                <div class="col">
+                    <div class="card shadow-sm">
+                        {% if apartment.photos.first %}
+                            <img src="{{ apartment.photos.first.image.url }}" alt="Thumbnails" class="bd-placeholder-img card-img-top equal-photo">
+                        {% else %}
+                            <!-- Dodaj tutaj domyślne zdjęcie, jeśli nie ma zdjęcia dla apartamentu -->
+                            <img src="" alt="Thumbnails" class="bd-placeholder-img card-img-top img-fluid">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5><p class="card-text">{{ apartment.name|capfirst }}</p></h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <a href="{% url 'reservations:ApartmentDetailView' pk=apartment.pk %}" class="btn btn-sm btn-secondary">View more</a>
+                                    <span style="margin: 0 5px;"></span>
+                                    <a href="{% url 'reservations:read_opinions' apartment.id %}" class="btn btn-sm btn-secondary">Read opinions</a>
+                                </div>
+                                <small class="text-body-secondary">{{ apartment.price }} $</small>
+                            </div>
+                            <div class="d-flex align-items-center"> 
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
+                                    <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.56.56 0 0 0-.163-.505L1.71 6.745l4.052-.576a.53.53 0 0 0 .393-.288L8 2.223l1.847 3.658a.53.53 0 0 0 .393.288l4.052.575-2.906 2.77a.56.56 0 0 0-.163.506l.694 3.957-3.686-1.894a.5.5 0 0 0-.461 0z"/>
+                                </svg>
+                                <p class="card-text mb-0">  {{ apartment.average_rating }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<footer class="text-body-secondary py-5">
+    <div class="container">
+        <p class="float-end mb-1">
+            <a href="#" class="btn btn-dark my-2 my-sm-0" type="submit">Back to top</a>
+        </p>
+    </div>
+</footer>
+
+<script src="/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+{% endblock %}

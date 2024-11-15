@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Apartment</title>
+</head>
+<body>
+    <h2>Delete Apartment</h2>
+    <p>Are you sure you want to delete reservation? "{{ booking.name }}"?</p>
+    
+
+    <form id="deleteBookingForm" method="post" action="{% url 'reservations:DeleteBookingView' pk=booking.pk %}">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-danger" value="Delete">
+        <a href="{% url 'reservations:apartment_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+
+    
+</body>
+</html>

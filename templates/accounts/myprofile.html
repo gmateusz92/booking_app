@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+</head>
+<body>
+    <h1 class="text-uppercase">My Profile</h1>
+    <hr>
+    
+    <div class="container">
+        
+        {% if user.profile.profile_picture %}
+        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
+        {% endif %}
+        <form method="{% url 'accounts:myprofile' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-3">
+                    {{ user_form.first_name.label_tag }}
+                    {{ user_form.first_name }}
+                </div>
+                <div class="col-md-3">
+                    {{ user_form.last_name.label_tag }}
+                    {{ user_form.last_name }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    {{ user_form.email.label_tag }}
+                    {{ user_form.email }}
+                </div>
+                <div class="col-md-3">
+                    {{ user_form.phone_number.label_tag }}
+                    {{ user_form.phone_number }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    {{ profile_form.address.label_tag }}
+                    {{ profile_form.address }}
+                </div>
+                <div class="col-md-3">
+                    {{ profile_form.country.label_tag }}
+                    {{ profile_form.country }}
+                </div>
+            </div>
+            <div class="row">
+                
+                <div class="col-md-3">
+                    {{ profile_form.city.label_tag }}
+                    {{ profile_form.city }}
+                </div>
+                <div class="col-md-3">
+                    {{ profile_form.profile_picture.label_tag }}
+                    {{ profile_form.profile_picture }}
+                </div>
+                
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>
+
+{% endblock %}

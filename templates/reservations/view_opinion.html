@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+    
+<div class="container">
+  <h1>Opinions</h1>
+  <hr>
+  <ul class="list-group">
+      {% for booking in bookings %}
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col">
+            <strong>Name:</strong> {{ booking.user.first_name }} <br>
+            <strong>Booking Date:</strong> {{ booking.check_in|date:"d-m-Y" }} - {{ booking.check_out|date:"d-m-Y" }}<br>
+            <strong>Opinion:</strong> {{ booking.comment }}<br>
+            <strong>Rating:</strong> {{ booking.rating }} 
+            <i class="bi bi-star"></i>
+          </div>
+        </div>
+      </li>
+      {% empty %}
+      <div class="alert alert-info text-center" role="alert">
+        There are no reviews for this apartment yet.
+      </div>
+      {% endfor %} 
+  </ul>
+</div>
+
+
+{% endblock %}

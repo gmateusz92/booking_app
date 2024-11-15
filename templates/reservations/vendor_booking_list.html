@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Booking List</h1>
+    <hr>
+    <ul class="list-group">
+        {% if bookings %}
+            {% for booking in bookings %}
+            <li class="list-group-item bg-light mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        {% if booking.name.photos.first %}
+                            <img src="{{ booking.name.photos.first.image.url }}" alt="Apartment Image" class="img-fluid rounded" style="max-width: 200px; max-height: 200px;">
+                        {% else %}
+                            <p class="text-center">No image available</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h4><strong>{{ booking.user.first_name|capfirst }} {{ booking.user.last_name|capfirst }}</strong> has reserved <strong>{{ booking.name.name|capfirst }}</strong> from <strong>{{ booking.check_in|date:"d.m.Y" }}</strong> to <strong>{{ booking.check_out|date:"d.m.Y" }}</strong>.</h4>
+                        <p>Email: {{ booking.user.email }}</p>
+                        <p>Phone Number: {{ booking.user.phone_number }}</p>
+                    </div>
+                    <div class="col-md-12 text-end mt-3">
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'reservations:DeleteBookingView' pk=booking.pk %}" class="btn btn-danger">Delete</a>
+                            <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-primary">Send Message</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                No bookings yet.
+            </div>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}

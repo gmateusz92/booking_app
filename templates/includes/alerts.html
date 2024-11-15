@@ -1,0 +1,29 @@
+{% if messages %}
+    {% for message in messages %}
+        <!-- show notification z animacją (w custom.css) / messagetags settings-->
+        <div class="alert alert-{{ message.tags }} show-notification" role="alert">
+            <!-- Usunięty krzyżyk -->
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<script>
+    window.onload = function() {
+        var messages = document.querySelectorAll('.show-notification');
+
+
+        messages.forEach(function(message) {
+            message.classList.add('show');
+        });
+
+
+        setTimeout(function() {
+            messages.forEach(function(message) {
+                message.style.opacity = 0;
+                message.style.visibility = 'hidden';
+            });
+        }, 2000);
+    };
+</script>

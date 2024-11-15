@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>Notification Preference</h1>
+    <hr>
+  You can receive an email notification when an apartment becomes available within your selected radius.
+<br>
+<div class="row align-items-md-stretch location-section">
+    <div class="col-md-6">
+        <div class="h-100 p-3 text-bg-light rounded-3">
+            <div class="form-container">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-secondary" >Save</button>
+                </form>
+            </div>    
+        </div>
+    </div>
+    <style>
+        ul.preferences-list {
+            list-style-type: none;
+            padding-left: 0; /* Opcjonalnie, aby usunąć wcięcie lewe */
+        }
+    </style>
+    
+    {% if preferences %}
+        <div class="col-md-6">
+            <div class="h-100 p-3 text-bg-light rounded-3 text-center">
+                <br><br><br><br><br>
+                {% if user.is_authenticated %}
+                    <h2>My Preferences</h2><br><br>
+                    <ul class="preferences-list">
+                        {% for preference in preferences %}                   
+                            <li class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ preference.city }} - Radius: {{ preference.radius }}km</span>
+                                    <a href="{% url 'reservations:DeletePreferenceView' pk=preference.pk %}" class="btn btn-secondary">Remove</a>
+                                </div>
+                            </li> 
+                        {% endfor %}
+                    </ul>
+                    {% if not preferences %}
+                        <div class="alert alert-info text-center" role="alert">
+                            No preferences yet.
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+</div>
+
+
+
+{% endblock %}

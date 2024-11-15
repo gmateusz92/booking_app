@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+    <!-- JavaScript -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_API_KEY}}&libraries=places&callback=initAutoComplete" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_API_KEY}}&libraries=places&callback=initMap" async defer></script>
+    
+    
+    <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script> -->
+    
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/custom.js' %}"></script>
+    <title>{% block title %}StayEasy{% endblock %}</title>
+</head>
+<body>
+{% load apartment_tags %}
+{% load widget_tweaks %}
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'reservations:home' %}">VacaHome</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                
+                      <li class="nav-item dropdown">
+                        
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          {% if profile.profile_picture %}
+                                  <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" style="max-height: 30px; max-width: 30px; border-radius: 50%;">
+                              
+                              {% endif %}
+                              {{ user.email }}
+                        </a>
+                         
+                        <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">My Profile</a></li>
+                          <li><a class="dropdown-item" href="{% url 'reservations:AddNotificationPreferenceView' %}">Notifictaion Preferences</a></li>
+                        </ul>
+                      </li>
+                        
+                        <li class="nav-item dropdown">
+                            {% if user|if_user_offer_apartment %} 
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              My Offers
+                            </a>
+                            {% endif %} 
+                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="{% url 'reservations:apartment_list' %}">My Apartments</a></li>
+                              <li><a class="dropdown-item" href="{% url 'reservations:vendor_booking_list' %}">Booked Apartments</a></li>
+                            </ul>
+                          </li>
+                          <li class="nav-item dropdown">
+                            {% if user|if_user_has_bookings %}
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              My Journeys
+                            </a>
+                            {% endif %}
+                            <ul class="dropdown-menu">
+                              {% if user|if_user_has_bookings %}  
+                              <li><a class="dropdown-item" href="{% url 'reservations:booking_list' %}">Current Bookings</a></li>
+                              {% endif %}
+                             
+                              <li><a class="dropdown-item" href="{% url 'reservations:booking_history' %}">Booking History</a></li>
+                              
+                            </ul>
+                          </li> 
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'weather:weather-forecast' %}">
+                            <i class="bi bi-cloud-sun"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-sun" viewBox="0 0 16 16">
+                                <path d="M7 8a3.5 3.5 0 0 1 3.5 3.555.5.5 0 0 0 .624.492A1.503 1.503 0 0 1 13 13.5a1.5 1.5 0 0 1-1.5 1.5H3a2 2 0 1 1 .1-3.998.5.5 0 0 0 .51-.375A3.5 3.5 0 0 1 7 8m4.473 3a4.5 4.5 0 0 0-8.72-.99A3 3 0 0 0 3 16h8.5a2.5 2.5 0 0 0 0-5z"/>
+                                <path d="M10.5 1.5a.5.5 0 0 0-1 0v1a.5.5 0 0 0 1 0zm3.743 1.964a.5.5 0 1 0-.707-.707l-.708.707a.5.5 0 0 0 .708.708zm-7.779-.707a.5.5 0 0 0-.707.707l.707.708a.5.5 0 1 0 .708-.708zm1.734 3.374a2 2 0 1 1 3.296 2.198q.3.423.516.898a3 3 0 1 0-4.84-3.225q.529.017 1.028.129m4.484 4.074c.6.215 1.125.59 1.522 1.072a.5.5 0 0 0 .039-.742l-.707-.707a.5.5 0 0 0-.854.377M14.5 6.5a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z"/>
+                              </svg>
+                            Weather Forecast
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:registerUser' %}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+
+
+<div class="container mt-4">
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+</body>
+</html>
+
+
+
+<!-- Bootstrap i Font Awesome JS skrypt do widomosci-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
+<script>
+  // Przykładowa funkcja do aktualizowania liczby nowych wiadomości
+  function updateMessageCount(count) {
+    // Pobieramy element z liczbą wiadomości
+    var messageCountElement = document.getElementById('message-count');
+    // Ustawiamy tekst licznika na wartość przekazaną jako argument
+    messageCountElement.innerText = count;
+  }
+
+  // Wywołujemy funkcję z przykładową liczbą nowych wiadomości
+  updateMessageCount(5); // Możesz zastąpić 5 rzeczywistą liczbą wiadomości
+
+  // Możesz użyć tej funkcji, aby zaktualizować liczbę wiadomości w przypadku otrzymania nowej wiadomości
+  // updateMessageCount(NowaLiczbaWiadomości);
+</script>

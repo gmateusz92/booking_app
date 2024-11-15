@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <style>
+        .sent-time {
+            font-size: smaller;
+        }
+        /* Dodatkowe style do pola tekstowego */
+        textarea.form-control {
+            resize: none; /* Wyłączenie możliwości zmiany rozmiaru pola tekstowego */
+            height: 150px; /* Ustawienie domyślnej wysokości pola tekstowego */
+            width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h4><p>Booking: {{ booking|capfirst }}.</p></h4>
+        <hr>
+        <div>
+            {% for message in messages %}
+                <img src="{{ message.sender_profile.profile_picture.url }}" alt="Profile Picture" style="max-height: 30px; max-width: 30px; border-radius: 50%;"> 
+                <p style="display: inline;">{{ message.sender.username|capfirst }}: {{ message.content|capfirst }}</p> <br>         
+                <small class="sent-time">Sent at: {{ message.timestamp }}</small></p>
+            {% endfor %}
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="content" class="form-control" placeholder="Type your message here..." required></textarea><br>
+            <button type="submit" class="btn btn-dark">Send</button>
+        </form>
+    </div>
+</body>
+</html>
+
+{% endblock %}

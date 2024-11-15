@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Current Bookings</h1>
+    <hr>
+    <ul class="list-group">
+        {% for booking in bookings %}
+        <li class="list-group-item bg-light mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    {% if booking.name.photos.first %}
+                        <img src="{{ booking.name.photos.first.image.url }}" alt="Apartment Image" class="img-fluid rounded" style="max-width: 100px; max-height: 100px;">
+                    {% else %}
+                        <p class="text-muted">No image available</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>{{ booking.name.name|capfirst }}</strong></p>
+                    <p class="mb-1">Reservation from {{ booking.check_in|date:"d.m.Y" }} to {{ booking.check_out|date:"d.m.Y" }}</p>
+                    <p class="mb-1">Owner: {{ booking.name.user.first_name|capfirst }}</p>
+                    <p class="mb-1">Description: {{ booking.name.description|capfirst }}</p>
+                    <p class="mb-1">Beds: {{ booking.name.beds }}</p>
+                    <p class="mb-1">Capacity: {{ booking.name.capacity }}</p>  
+                </div>
+                <div class="col-md-3 d-flex align-items-center justify-content-end">
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'reservations:message_view' booking_id=booking.pk %}" class="btn btn-primary">Send Message</a>
+                    </div>
+                </div>
+                
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

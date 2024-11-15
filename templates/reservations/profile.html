@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'includes/alerts.html' %}
+
+                   
+<div class="container mt-5">
+<h1>Profile Settings</h1>
+<hr>
+<div class="h-100 p-3 text-bg-light rounded-3">
+<div class="container">
+<form action="{% url 'accounts:profile' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if profile.profile_picture %}
+    <img class="thumbnail" src="{{profile.profile_picture.url}}" alt="Profile Picture">
+        {% else %}
+            Upload Profile Photo.
+        {% endif %}
+        <div class="text-holder">
+            
+            <div class="upload-gallery">
+                {{profile_form.profile_picture}}
+            </div>
+            <label class="text-danger">{{ profile_form.profile_picture.errors }}</label>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="row">
+                    <div class="col-md-5">
+                        {{ user_form.first_name.label_tag }}
+                        {{ user_form.first_name }}
+                    </div>
+                    <div class="col-md-5">
+                        {{ user_form.last_name.label_tag }}
+                        {{ user_form.last_name }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        {{ user_form.email.label_tag }}
+                        {{ user_form.email }}
+                    </div>
+                    <div class="col-md-5">
+                        {{ user_form.phone_number.label_tag }}
+                        {{ user_form.phone_number }}    
+                    </div>
+                </div>    
+                <div class="row">
+                    <div class="col-md-5">
+                        {{ profile_form.address.label_tag }}
+                        {{ profile_form.address }}
+                    </div>
+                    <div class="col-md-5">
+                        {{ profile_form.country.label_tag }}
+                        {{ profile_form.country }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        {{ profile_form.city.label_tag }}
+                        {{ profile_form.city }}
+                    </div>
+                    <div class="col-md-5">
+                        {{ profile_form.state.label_tag }}
+                    {{ profile_form.state }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-secondary mt-3">Save Changes</button>    
+            </div>
+        </div>    
+    </div>
+</form>
+
+
+  
+
+{% endblock %}
