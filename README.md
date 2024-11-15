@@ -2,7 +2,7 @@
 This code represents a Django application that manages reservations for apartments, similar to platforms like Booking.com or Airbnb. Here's a brief overview of the functionalities
 
 ## Key Features:
-User Registration and Activation: Users can sign up and activate their account via an email link.
+Users Registration and Activation: Users can sign up and activate their account via an email link.
 Login/Logout: Users can log in with credentials and log out from the application.
 Profile Management: Users can update their personal profile details.
 Password Recovery: Users can reset their password via a link sent to their email.
