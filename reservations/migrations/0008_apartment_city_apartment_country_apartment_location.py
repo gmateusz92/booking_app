@@ -7,23 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0007_apartment_user'),
+        ("reservations", "0007_apartment_user"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='apartment',
-            name='city',
+            model_name="apartment",
+            name="city",
             field=models.CharField(max_length=50, null=True),
         ),
         migrations.AddField(
-            model_name='apartment',
-            name='country',
+            model_name="apartment",
+            name="country",
             field=models.CharField(max_length=50, null=True),
         ),
         migrations.AddField(
-            model_name='apartment',
-            name='location',
-            field=django.contrib.gis.db.models.fields.PointField(blank=True, null=True, srid=4326),
+            model_name="apartment",
+            name="location",
+            field=django.contrib.gis.db.models.fields.PointField(
+                blank=True, null=True, srid=4326
+            ),
         ),
     ]

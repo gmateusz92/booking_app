@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0025_notificationpreference'),
+        ("reservations", "0025_notificationpreference"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notificationpreference',
-            name='latitude',
+            model_name="notificationpreference",
+            name="latitude",
             field=models.FloatField(blank=True, max_length=20, null=True),
         ),
         migrations.AddField(
-            model_name='notificationpreference',
-            name='longitude',
+            model_name="notificationpreference",
+            name="longitude",
             field=models.FloatField(blank=True, max_length=20, null=True),
         ),
     ]

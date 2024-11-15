@@ -8,36 +8,63 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0001_initial'),
+        ("reservations", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Booking',
+            name="Booking",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('check_in', models.DateTimeField(null=True)),
-                ('check_out', models.DateTimeField(null=True)),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("check_in", models.DateTimeField(null=True)),
+                ("check_out", models.DateTimeField(null=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Home',
+            name="Home",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=20)),
-                ('beds', models.IntegerField(null=True)),
-                ('capacity', models.IntegerField(null=True)),
-                ('price', models.IntegerField(null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=20)),
+                ("beds", models.IntegerField(null=True)),
+                ("capacity", models.IntegerField(null=True)),
+                ("price", models.IntegerField(null=True)),
             ],
         ),
         migrations.DeleteModel(
-            name='Room',
+            name="Room",
         ),
         migrations.AddField(
-            model_name='booking',
-            name='name',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='reservations.home'),
+            model_name="booking",
+            name="name",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="reservations.home",
+            ),
         ),
     ]

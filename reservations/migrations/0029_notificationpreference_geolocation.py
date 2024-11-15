@@ -7,13 +7,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0028_notificationpreference_city_and_more'),
+        ("reservations", "0028_notificationpreference_city_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notificationpreference',
-            name='geolocation',
+            model_name="notificationpreference",
+            name="geolocation",
             field=django_google_maps.fields.GeoLocationField(max_length=100, null=True),
         ),
     ]

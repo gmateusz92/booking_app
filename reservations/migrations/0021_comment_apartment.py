@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0020_comment_delete_booking_notification'),
+        ("reservations", "0020_comment_delete_booking_notification"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='comment',
-            name='apartment',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='reservations.apartment'),
+            model_name="comment",
+            name="apartment",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="reservations.apartment",
+            ),
         ),
     ]

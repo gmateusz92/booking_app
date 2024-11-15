@@ -1,24 +1,25 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
 from datetime import datetime
 import requests
+from django.shortcuts import redirect, render
+
 
 def weather_forecast(request):
-    if request.method == 'GET' and 'q' in request.GET:
-        city_name = request.GET.get('q')
-        url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city_name}?unitGroup=metric&key=Z9WKQT48NZFKQSPCRKQCQX454&contentType=json"
+    if request.method == "GET" and "q" in request.GET:
+        city_name = request.GET.get("q")
+        url = (f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city_name}"
+              f"?unitGroup=metric&key=Z9WKQT48NZFKQSPCRKQCQX454&contentType=json")
         response = requests.get(url)
-        
+
         if response.status_code == 200:
             data = response.json()
-            city_name = data.get('resolvedAddress', '')
-            date = data.get('days', [{}])[0].get('datetime', '')
-            temp = data.get('days', [{}])[0].get('temp', '')
-            feelslike = data.get('days', [{}])[0].get('feelslike', '')
+            city_name = data.get("resolvedAddress", "")
+            date = data.get("days", [{}])[0].get("datetime", "")
+            temp = data.get("days", [{}])[0].get("temp", "")
+            feelslike = data.get("days", [{}])[0].get("feelslike", "")
 
-            date_formatted = datetime.strptime(date, '%Y-%m-%d')
-            date = date_formatted.strftime('%d.%m.%Y')
-            weekday = date_formatted.strftime('%A')
+            date_formatted = datetime.strptime(date, "%Y-%m-%d")
+            date = date_formatted.strftime("%d.%m.%Y")
+            weekday = date_formatted.strftime("%A")
 
             weather_data = []
             for day in data["days"]:
@@ -43,7 +44,7 @@ def weather_forecast(request):
                     weather_condition = "Unknown"
 
                 weather_day = {
-                    "humidity": day['humidity'],
+                    "humidity": day["humidity"],
                     "date": day["datetime"],
                     "temp_max": day["tempmax"],
                     "temp_min": day["tempmin"],
@@ -55,16 +56,16 @@ def weather_forecast(request):
                 weather_data.append(weather_day)
 
                 context = {
-                    'weather_data': weather_data,
-                    'city_name': city_name,
-                    'date': date,
-                    'weekday': weekday,
-                    'temp':temp,
-                    'feelslike': feelslike
+                    "weather_data": weather_data,
+                    "city_name": city_name,
+                    "date": date,
+                    "weekday": weekday,
+                    "temp": temp,
+                    "feelslike": feelslike,
                 }
 
-            return render(request, 'weather/weather-forecast.html', context)
+            return render(request, "weather/weather-forecast.html", context)
         else:
-            return redirect('weather:weather_forecast')
+            return redirect("weather:weather_forecast")
     else:
-        return render(request, 'weather/weather-forecast.html')
+        return render(request, "weather/weather-forecast.html")

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0002_remove_user_role_alter_user_is_active'),
+        ("accounts", "0002_remove_user_role_alter_user_is_active"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='role',
-            field=models.PositiveSmallIntegerField(blank=True, choices=[(1, 'Vendor'), (2, 'Customer')], null=True),
+            model_name="user",
+            name="role",
+            field=models.PositiveSmallIntegerField(
+                blank=True, choices=[(1, "Vendor"), (2, "Customer")], null=True
+            ),
         ),
     ]

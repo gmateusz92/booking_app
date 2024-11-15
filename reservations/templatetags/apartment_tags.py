@@ -1,8 +1,11 @@
-from django import template
-from reservations.models import Apartment, Booking
 from datetime import date
 
+from django import template
+
+from reservations.models import Apartment, Booking
+
 register = template.Library()
+
 
 @register.filter
 def if_user_offer_apartment(user):
@@ -10,11 +13,13 @@ def if_user_offer_apartment(user):
         return Apartment.objects.filter(user=user).exists()
     return False
 
+
 @register.filter
 def if_user_has_bookings(user):
     return Booking.objects.filter(user=user).exists()
 
-@register.filter(name='if_owner_has_bookings')
+
+@register.filter(name="if_owner_has_bookings")
 def if_owner_has_bookings(user, apartment):
     # Sprawdź, czy użytkownik jest właścicielem apartamentu
     if apartment.user == user:
@@ -22,6 +27,7 @@ def if_owner_has_bookings(user, apartment):
         if Booking.objects.filter(name=apartment).exists():
             return True
     return False
+
 
 @register.filter
 def if_user_has_booking_history(user):

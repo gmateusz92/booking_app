@@ -6,24 +6,24 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0005_userprofile_latitude_userprofile_location_and_more'),
+        ("accounts", "0005_userprofile_latitude_userprofile_location_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='userprofile',
-            name='cover_photo',
+            model_name="userprofile",
+            name="cover_photo",
         ),
         migrations.RemoveField(
-            model_name='userprofile',
-            name='latitude',
+            model_name="userprofile",
+            name="latitude",
         ),
         migrations.RemoveField(
-            model_name='userprofile',
-            name='location',
+            model_name="userprofile",
+            name="location",
         ),
         migrations.RemoveField(
-            model_name='userprofile',
-            name='longitude',
+            model_name="userprofile",
+            name="longitude",
         ),
     ]

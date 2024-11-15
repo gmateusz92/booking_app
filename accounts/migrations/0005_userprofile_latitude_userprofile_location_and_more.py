@@ -7,23 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0004_remove_user_role'),
+        ("accounts", "0004_remove_user_role"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='latitude',
+            model_name="userprofile",
+            name="latitude",
             field=models.CharField(blank=True, max_length=20, null=True),
         ),
         migrations.AddField(
-            model_name='userprofile',
-            name='location',
-            field=django.contrib.gis.db.models.fields.PointField(blank=True, null=True, srid=4326),
+            model_name="userprofile",
+            name="location",
+            field=django.contrib.gis.db.models.fields.PointField(
+                blank=True, null=True, srid=4326
+            ),
         ),
         migrations.AddField(
-            model_name='userprofile',
-            name='longitude',
+            model_name="userprofile",
+            name="longitude",
             field=models.CharField(blank=True, max_length=20, null=True),
         ),
     ]

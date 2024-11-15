@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0027_notificationpreference_address'),
+        ("reservations", "0027_notificationpreference_address"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notificationpreference',
-            name='city',
+            model_name="notificationpreference",
+            name="city",
             field=models.CharField(max_length=50, null=True),
         ),
         migrations.AddField(
-            model_name='notificationpreference',
-            name='country',
+            model_name="notificationpreference",
+            name="country",
             field=models.CharField(max_length=50, null=True),
         ),
     ]

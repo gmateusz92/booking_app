@@ -7,20 +7,40 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0005_rename_home_apartment'),
+        ("reservations", "0005_rename_home_apartment"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='apartment',
-            name='image',
+            model_name="apartment",
+            name="image",
         ),
         migrations.CreateModel(
-            name='Photo',
+            name="Photo",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(blank=True, null=True, upload_to='static/images/')),
-                ('apartment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='photos', to='reservations.apartment')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        blank=True, null=True, upload_to="static/images/"
+                    ),
+                ),
+                (
+                    "apartment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="photos",
+                        to="reservations.apartment",
+                    ),
+                ),
             ],
         ),
     ]
