@@ -1,1 +1,7 @@
 .env
+venv/
+.flake8
+*.whl
+*.pyc
+*.pyo
+__pycache__/
